@@ -9,6 +9,7 @@ npm i express
 npm i bcryptjs
 npm i dotenv
 npm i sequelize
+npm i pg pg-hstore
 
 
 The .env file should include
