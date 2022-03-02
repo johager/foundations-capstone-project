@@ -49,14 +49,37 @@ p:hover {
     cursor: pointer;
 }
 
-/* .cont_sect {
+input {
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+}
+
+textarea {
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+    width: 100%;
+    padding: 4px 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.del_btn {
     color: #646464;
-    text-align: right;
-    font-size: 0.8em;
-    width: 80px;
-    padding-right: 0.6em;
-    margin-bottom: -4px;
-} */
+    border: 1px solid #646464;
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin-left: 16px;
+}
+
+.state {
+    width: 100px;
+}
+
+.state {
+    width: 30px;
+}
+
+.zip {
+    width: 60px;
+}
 
 .cont_sect, .type {
     color: #646464;
@@ -68,6 +91,10 @@ p:hover {
 
 .cont_sect {
     margin-bottom: -4px;
+}
+
+.data {
+    flex-grow: 4;
 }
 
 div.cont_details {
