@@ -43,11 +43,6 @@ module.exports = {
         const {fname, lname, phones, emails, addr1s, addr2s, cities, states, zips, note} = req.body
 
         let qry = `insert into contacts (user_id, fname, lname, note) values(${userId}, '${fname}', '${lname}', '${note}') returning contact_id`
-        // qry += `update phones set phone='${phones[0]}' where phone_id=${phoneIds[0]};`
-        // qry += `update emails set email='${emails[0]}' where email_id=${emailIds[0]};`
-        // qry += `update phones set phone='${phones[0]}' where phone_id=${phoneIds[0]};`
-        // qry += `update addresses set addr1='${addr1s[0]}', addr2='${addr2s[0]}', city='${cities[0]}', state='${states[0]}', zip='${zips[0]}' where address_id=${addrIds[0]};`
-        // qry += contactQuery(contId)
         console.log("putContact qry:", qry)
 
         // res.status(200)

@@ -6,6 +6,7 @@
 body {
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
     background-color: #F3F3F3;
+    height: 100%;
     width: 300px;
     margin: 0px auto;
 }
@@ -49,12 +50,21 @@ p:hover {
     cursor: pointer;
 }
 
+main {
+    position: absolute;
+    overflow: scroll;
+    top: 30px;
+    bottom: 0px;
+    width: 300px;
+}
+
 input {
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
 }
 
 textarea {
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
     width: 100%;
     padding: 4px 8px;
     margin-top: 8px;

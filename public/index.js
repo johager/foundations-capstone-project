@@ -176,9 +176,10 @@ function updateContact() {
 function showContactDisp() {
     console.log("showContactDisp() === === ===")
 
-    const {fname, lname, company, note} = contactInfo[0]
+    const {fname, lname, company} = contactInfo[0]
+    let {note} = contactInfo[0]
+    note = note.replace(/(?:\r\n|\r|\n)/g, '<br>')
 
-    // title.textContent = 'Contact'
     title.textContent = `${fname} ${lname}`
     leftNav.textContent = '< Contacts'
     rightNav.textContent = 'Edit'
@@ -186,8 +187,6 @@ function showContactDisp() {
     leftNavAction = showAllContacts
     rightNavAction = showEditContact
 
-    // let innerHTML = `<div>${fname} ${lname}</div>`
-    // let innerHTML = '<div class="cont_details">'
     let innerHTML = ''
     if (company.length > 0) {
         innerHTML += `\n<div>${company}</div>`
@@ -196,19 +195,19 @@ function showContactDisp() {
     innerHTML += '\n<div class="cont_sect">Phone</div>'
     const {phone, type: pType} = contactInfo[1]
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">${pType}:</div><div>${phone}</div>`
+    innerHTML += `\n<div class="type">${pType}</div><div>${phone}</div>`
     innerHTML += '\n</div>'
     
     innerHTML += '\n<div class="cont_sect">Email</div>'
     const {email, type: eType} = contactInfo[2]
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">${eType}:</div><div>${email}</div>`
+    innerHTML += `\n<div class="type">${eType}</div><div>${email}</div>`
     innerHTML += '\n</div>'
     
     innerHTML += '\n<div class="cont_sect">Address</div>'
     const {addr1, addr2, city, state, zip, type: aType} = contactInfo[3]
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">${aType}:</div><div>`
+    innerHTML += `\n<div class="type">${aType}</div><div>`
     if (addr1.length > 0) {
         innerHTML += `${addr1}<br>`
     }
@@ -239,16 +238,13 @@ function showContactAddEdit(titleText) {
     leftNav.textContent = 'Cancel'
     rightNav.textContent = 'Save'
 
-    // let innerHTML = `<div>${fname} ${lname}</div>`
-    // let innerHTML = '<div class="cont_details">'
     let innerHTML = ''
 
-    // title.textContent = `${fname} ${lname}`
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">first:</div><input type="text" class="data" name="fname" value="${fname}">`
+    innerHTML += `\n<div class="type">first</div><input type="text" class="data" name="fname" value="${fname}">`
     innerHTML += '\n</div>'
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">last:</div><input type="text" class="data" name="lname" value="${lname}">`
+    innerHTML += `\n<div class="type">last</div><input type="text" class="data" name="lname" value="${lname}">`
     innerHTML += '\n</div>'
 
     if (company.length > 0) {
@@ -259,21 +255,21 @@ function showContactAddEdit(titleText) {
     const {phone_id: phoneId, phone, type: pType} = contactInfo[1]
     innerHTML += '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="phone_id" value="${phoneId}">`
-    innerHTML += `\n<div class="type">${pType}:</div><input type="text" class="data" name="phone" value="${phone}">`
+    innerHTML += `\n<div class="type">${pType}</div><input type="text" class="data" name="phone" value="${phone}">`
     innerHTML += '\n</div>'
 
     innerHTML += '\n<div class="cont_sect">Email</div>'
     const {email_id: emailId, email, type: eType} = contactInfo[2]
     innerHTML += '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="email_id" value="${emailId}">`
-    innerHTML += `\n<div class="type">${eType}:</div><input type="email" class="data" name="email" value="${email}">`
+    innerHTML += `\n<div class="type">${eType}</div><input type="email" class="data" name="email" value="${email}">`
     innerHTML += '\n</div>'
 
     innerHTML += '\n<div class="cont_sect">Address</div>'
     const {address_id: addrId, addr1, addr2, city, state, zip, type: aType} = contactInfo[3]
     innerHTML += '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="addr_id" value="${addrId}">`
-    innerHTML += `\n<div class="type">${aType}:</div><div>`
+    innerHTML += `\n<div class="type">${aType}</div><div>`
     innerHTML += `\n<input type="text" class="data" name="addr1" value="${addr1}"><br>`
     innerHTML += `\n<input type="text" class="data" name="addr2" value="${addr2}"><br>`
 
