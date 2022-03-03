@@ -4,6 +4,10 @@ console.log("userId:", userId)
 let contId = 0
 let contactInfo = []
 
+const pTypes = []
+const eTypes = []
+const aTypes = []
+
 const title = document.getElementById('title')
 const leftNav = document.getElementById('back')
 const rightNav = document.getElementById('right')
@@ -81,8 +85,14 @@ function showEditContact() {
     showContactAddEdit('Edit')
 }
 
-function addContact() {
-    console.log("addContact() === === ===")
+function contactObjForAdd() {
+
+    const pTypeIds = []
+    document.getElementsByName('ptype_id').forEach(ele => pTypeIds.push(ele.value))
+    const eTypeIds = []
+    document.getElementsByName('etype_id').forEach(ele => eTypeIds.push(ele.value))
+    const aTypeIds = []
+    document.getElementsByName('atype_id').forEach(ele => aTypeIds.push(ele.value))
 
     const phones = []
     document.getElementsByName('phone').forEach(ele => phones.push(ele.value.trim()))
@@ -103,14 +113,25 @@ function addContact() {
         fname: document.getElementsByName('fname')[0].value.trim(),
         lname: document.getElementsByName('lname')[0].value.trim(),
         note: document.getElementsByName('note')[0].value.trim(),
+        pTypeIds: pTypeIds,
         phones: phones,
+        eTypeIds: eTypeIds,
         emails: emails,
+        aTypeIds: aTypeIds,
         addr1s: addr1s,
         addr2s: addr2s,
         cities: cities,
         states: states,
         zips: zips        
     }
+
+    return contactObj
+}
+
+function addContact() {
+    console.log("addContact() === === ===")
+
+    const contactObj = contactObjForAdd()
 
     console.log("addContact contactObj:", contactObj)
 
@@ -125,6 +146,8 @@ function addContact() {
 function updateContact() {
     console.log("updateContact() === === ===")
 
+    const contactObj = contactObjForAdd()
+
     const phoneIds = []
     document.getElementsByName('phone_id').forEach(ele => phoneIds.push(ele.value))
     const emailIds = []
@@ -132,36 +155,9 @@ function updateContact() {
     const addrIds = []
     document.getElementsByName('addr_id').forEach(ele => addrIds.push(ele.value))
 
-    const phones = []
-    document.getElementsByName('phone').forEach(ele => phones.push(ele.value.trim()))
-    const emails = []
-    document.getElementsByName('email').forEach(ele => emails.push(ele.value.trim()))
-    const addr1s = []
-    document.getElementsByName('addr1').forEach(ele => addr1s.push(ele.value.trim()))
-    const addr2s = []
-    document.getElementsByName('addr2').forEach(ele => addr2s.push(ele.value.trim()))
-    const cities = []
-    document.getElementsByName('city').forEach(ele => cities.push(ele.value.trim()))
-    const states = []
-    document.getElementsByName('state').forEach(ele => states.push(ele.value.trim()))
-    const zips = []
-    document.getElementsByName('zip').forEach(ele => zips.push(ele.value.trim()))
-
-    const contactObj = {
-        fname: document.getElementsByName('fname')[0].value.trim(),
-        lname: document.getElementsByName('lname')[0].value.trim(),
-        note: document.getElementsByName('note')[0].value.trim(),
-        phoneIds: phoneIds,
-        phones: phones,
-        emailIds: emailIds,
-        emails: emails,
-        addrIds: addrIds,
-        addr1s: addr1s,
-        addr2s: addr2s,
-        cities: cities,
-        states: states,
-        zips: zips        
-    }
+    contactObj.phoneIds = phoneIds
+    contactObj.emailIds = emailIds
+    contactObj.addrIds = addrIds
 
     console.log("updateContact contactObj:", contactObj)
 
@@ -229,6 +225,20 @@ function showContactDisp() {
     main.innerHTML = innerHTML
 }
 
+function makeSelect(name, types, typeId) {
+    let innerHTML = `<select name="${name}">\n`
+    innerHTML += '<option value="0">- type -</option>\n'
+    for (let type of types) {
+        innerHTML += `<option value="${type.id}"`
+        if (type.id === typeId) {
+            innerHTML += ' selected="selected"'
+        }
+        innerHTML += `>${type.type}</option>\n`
+    }
+    innerHTML += '</select>'
+    return innerHTML
+}
+
 function showContactAddEdit(titleText) {
     console.log("showContactAddEdit() === === ===")
 
@@ -252,24 +262,24 @@ function showContactAddEdit(titleText) {
     }
 
     innerHTML += '\n<div class="cont_sect">Phone</div>'
-    const {phone_id: phoneId, phone, type: pType} = contactInfo[1]
+    const {phone_id: phoneId, phone, type_id: pTypeId} = contactInfo[1]
     innerHTML += '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="phone_id" value="${phoneId}">`
-    innerHTML += `\n<div class="type">${pType}</div><input type="text" class="data" name="phone" value="${phone}">`
+    innerHTML += `\n<div class="type">${makeSelect('ptype_id', pTypes, pTypeId)}</div><input type="text" class="data" name="phone" value="${phone}">`
     innerHTML += '\n</div>'
 
     innerHTML += '\n<div class="cont_sect">Email</div>'
-    const {email_id: emailId, email, type: eType} = contactInfo[2]
+    const {email_id: emailId, email, type_id: eTypeId} = contactInfo[2]
     innerHTML += '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="email_id" value="${emailId}">`
-    innerHTML += `\n<div class="type">${eType}</div><input type="email" class="data" name="email" value="${email}">`
+    innerHTML += `\n<div class="type">${makeSelect('etype_id', eTypes, eTypeId)}</div><input type="email" class="data" name="email" value="${email}">`
     innerHTML += '\n</div>'
 
     innerHTML += '\n<div class="cont_sect">Address</div>'
-    const {address_id: addrId, addr1, addr2, city, state, zip, type: aType} = contactInfo[3]
+    const {address_id: addrId, addr1, addr2, city, state, zip, type_id: aTypeId} = contactInfo[3]
     innerHTML += '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="addr_id" value="${addrId}">`
-    innerHTML += `\n<div class="type">${aType}</div><div>`
+    innerHTML += `\n<div class="type">${makeSelect('atype_id', aTypes, aTypeId)}</div><div>`
     innerHTML += `\n<input type="text" class="data" name="addr1" value="${addr1}"><br>`
     innerHTML += `\n<input type="text" class="data" name="addr2" value="${addr2}"><br>`
 
@@ -355,7 +365,42 @@ function showAllContacts() {
     .catch(err => console.log(err))
 }
 
+//
+// === set up ===
+///
+
+function setTypeArrays(typeObjs) {
+    console.log("setTypeArrays()")
+    // typeObjs is an array of objects like {id:, type:}
+    // id is 1 for the first object of each type
+
+    const types = [pTypes, eTypes, aTypes]
+    let typeIndex = -1
+    let type = []
+    for (let typeObj of typeObjs) {
+        if (typeObj.id === 1) {
+            typeIndex++
+            type = types[typeIndex]
+        }
+        type.push(typeObj)
+    }
+    console.log("setTypeArrays pTypes:", pTypes)
+    console.log("setTypeArrays eTypes:", eTypes)
+    console.log("setTypeArrays aTypes:", aTypes)
+}
+
+function getTypeArrays() {
+    console.log("getTypeArrays()")
+    axios.get(`/api/typearrays`)
+    .then(res => {
+        console.log("getTypeArrays then res.body:", res.data)
+        setTypeArrays(res.data)
+    })
+    .catch(err => console.log(err))
+}
+
 leftNav.addEventListener('click', doLeftNavAction)
 rightNav.addEventListener('click', doRightNavAction)
 
-showAllContacts();
+showAllContacts()
+getTypeArrays()

@@ -14,7 +14,7 @@ app.get('/', (req,res) => {
 
 app.use(express.static(path.join(__dirname, '../public')))
 
-const {getContact, postContact, putContact, deleteContact, getAllContacts} = require('./controller.js')
+const {getContact, postContact, putContact, deleteContact, getAllContacts, getTypeArrays} = require('./controller.js')
 
 // contact
 app.get('/api/contact', getContact)
@@ -24,5 +24,8 @@ app.delete('/api/contact', deleteContact)
 
 // contacts
 app.get('/api/contacts', getAllContacts)
+
+// setup
+app.get('/api/typearrays', getTypeArrays)
 
 app.listen(PORT, () => { console.log(`Up on port ${PORT}`) })

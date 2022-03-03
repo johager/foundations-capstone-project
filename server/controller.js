@@ -40,7 +40,7 @@ module.exports = {
         const userId = req.params.id
         console.log("postContact req.body:", req.body)
 
-        const {fname, lname, phones, emails, addr1s, addr2s, cities, states, zips, note} = req.body
+        const {fname, lname, pTypeIds, phones, eTypeIds, emails, aTypeIds, addr1s, addr2s, cities, states, zips, note} = req.body
 
         let qry = `insert into contacts (user_id, fname, lname, note) values(${userId}, '${fname}', '${lname}', '${note}') returning contact_id`
         console.log("putContact qry:", qry)
@@ -54,10 +54,9 @@ module.exports = {
                 const contId = dbRes[0][0].contact_id
                 console.log("putContact then1 contId:", contId)
 
-                let qry = `insert into phones (contact_id, type_id, phone, sort) values(${contId}, 1, '${phones[0]}', 1);`
-                qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, 1, '${emails[0]}', 1);`
-                qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, 1, '${phones[0]}', 1);`
-                qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, 1, '${addr1s[0]}', '${addr2s[0]}', '${cities[0]}', '${states[0]}', '${zips[0]}', 1);`
+                let qry = `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[0]}, '${phones[0]}', 1);`
+                qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[0]}, '${emails[0]}', 1);`
+                qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[0]}, '${addr1s[0]}', '${addr2s[0]}', '${cities[0]}', '${states[0]}', '${zips[0]}', 1);`
                 qry += contactQuery(contId)
                 console.log("putContact then1 qry:", qry)
 
@@ -73,17 +72,16 @@ module.exports = {
         console.log("putContact contId:", contId)
         console.log("putContact req.body:", req.body)
 
-        const {fname, lname, phoneIds, phones, emailIds, emails, addrIds, addr1s, addr2s, cities, states, zips, note} = req.body
+        const {fname, lname, phoneIds, pTypeIds, phones, emailIds, eTypeIds, emails, addrIds, aTypeIds, addr1s, addr2s, cities, states, zips, note} = req.body
 
         console.log("putContact phoneIds:", phoneIds)
         console.log("putContact emailIds:", emailIds)
         console.log("putContact addrIds:", addrIds)
 
         let qry = `update contacts set fname='${fname}', lname='${lname}', note='${note}' where contact_id=${contId};`
-        qry += `update phones set phone='${phones[0]}' where phone_id=${phoneIds[0]};`
-        qry += `update emails set email='${emails[0]}' where email_id=${emailIds[0]};`
-        qry += `update phones set phone='${phones[0]}' where phone_id=${phoneIds[0]};`
-        qry += `update addresses set addr1='${addr1s[0]}', addr2='${addr2s[0]}', city='${cities[0]}', state='${states[0]}', zip='${zips[0]}' where address_id=${addrIds[0]};`
+        qry += `update phones set type_id=${pTypeIds[0]}, phone='${phones[0]}' where phone_id=${phoneIds[0]};`
+        qry += `update emails set type_id=${eTypeIds[0]}, email='${emails[0]}' where email_id=${emailIds[0]};` 
+        qry += `update addresses set type_id=${aTypeIds[0]}, addr1='${addr1s[0]}', addr2='${addr2s[0]}', city='${cities[0]}', state='${states[0]}', zip='${zips[0]}' where address_id=${addrIds[0]};`
         qry += contactQuery(contId)
         console.log("putContact qry:", qry)
 
@@ -119,7 +117,20 @@ module.exports = {
         const qry = contactsQuery(userId)
         console.log("getAllContacts qry:", qry)
         sequelize.query(qry)
-            .then(dbRes => res.status(200).send(dbRes[0]))
-            .catch(err => console.log(err))
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(err => console.log(err))
+    },
+    //
+    // === set up ===
+    ///
+    getTypeArrays: (req, res) => {
+        console.log("getTypeArrays")
+        let qry = `select * from phone_types order by id;`
+        qry += `select * from email_types order by id;`
+        qry += `select * from address_types order by id;`
+        console.log("getTypeArrays qry:", qry)
+        sequelize.query(qry)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(err => console.log(err))
     }
 }
