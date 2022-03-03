@@ -9,7 +9,7 @@ const eTypes = []
 const aTypes = []
 
 const title = document.getElementById('title')
-const leftNav = document.getElementById('back')
+const leftNav = document.getElementById('left')
 const rightNav = document.getElementById('right')
 const main = document.querySelector('main')
 
@@ -22,13 +22,11 @@ let rightNavAction = () => {}
 
 function doLeftNavAction(evt) {
     console.log("doLeftNavAction() === === ===")
-    evt.preventDefault()
     leftNavAction()
 }
 
 function doRightNavAction(evt) {
     console.log("doRightNavAction() === === ===")
-    evt.preventDefault()
     rightNavAction()
 }
 
@@ -326,6 +324,7 @@ function showContacts(contacts) {
         const div = document.createElement('div')
         const span = document.createElement('span')
         span.id = contId
+        span.classList = "hover"
         span.textContent = `${lname}, ${fname}`
         span.addEventListener('click', clickedOnContact)
         div.appendChild(span)

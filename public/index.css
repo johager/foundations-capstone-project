@@ -18,6 +18,12 @@ header {
     margin-bottom: 8px;
 }
 
+#title {
+    text-align: center;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
 nav {
     position: absolute;
     top: 4px;
@@ -28,31 +34,19 @@ nav {
     font-size: 0.8em;
 }
 
-#title {
-    text-align: center;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-
-a:link, a:visited, a:active {
+nav button {
     color: #0040DD;
-    font-weight: normal;
-    text-decoration: none;
+    background-color: none;
+    border: none;
 }
 
-a:hover {
-    color: #000000;
-    font-weight: normal;
-    text-decoration: none;
-}
-
-p:hover {
+button, .hover {
     cursor: pointer;
 }
 
 main {
     position: absolute;
-    overflow: scroll;
+    overflow: auto;
     top: 30px;
     bottom: 0px;
     width: 300px;
