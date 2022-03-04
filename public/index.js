@@ -48,28 +48,6 @@ function showNewContact() {
             fname: '',
             lname: '',
             note: ''
-        },
-        {
-            phone: '',
-            phone_id: 0,
-            type: 'mobile',
-            type_id: 1
-        },
-        {
-            email: '',
-            email_id: 0,
-            type: 'home',
-            type_id: 1
-        },
-        {
-            addr1: '',
-            addr2: '',
-            address_id: 0,
-            city: '',
-            state: '',
-            type: 'home',
-            type_id: 1,
-            zip: ''
         }
     ]
     leftNavAction = showAllContacts
@@ -171,8 +149,7 @@ function showContactDisp() {
     console.log("showContactDisp() === === ===")
 
     const {fname, lname, company} = contactInfo[0]
-    let {note} = contactInfo[0]
-    note = note.replace(/(?:\r\n|\r|\n)/g, '<br>')
+    const note = contactInfo[0].note.replace(/(?:\r\n|\r|\n)/g, '<br>')
 
     title.textContent = `${fname} ${lname}`
     leftNav.textContent = '< Contacts'
@@ -186,34 +163,86 @@ function showContactDisp() {
         innerHTML += `\n<div>${company}</div>`
     }
 
-    innerHTML += '\n<div class="cont_sect">Phone</div>'
-    const {phone, type: pType} = contactInfo[1]
-    innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">${pType}</div><div>${phone}</div>`
-    innerHTML += '\n</div>'
-    
-    innerHTML += '\n<div class="cont_sect">Email</div>'
-    const {email, type: eType} = contactInfo[2]
-    innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">${eType}</div><div>${email}</div>`
-    innerHTML += '\n</div>'
-    
-    innerHTML += '\n<div class="cont_sect">Address</div>'
-    const {addr1, addr2, city, state, zip, type: aType} = contactInfo[3]
-    innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">${aType}</div><div>`
-    if (addr1.length > 0) {
-        innerHTML += `${addr1}<br>`
+    let i = 1
+    let isFirst = true
+    while (contactInfo.length > i && "phone" in contactInfo[i]) {
+        if (isFirst) {
+            innerHTML += '\n<div class="cont_sect">Phone</div>'
+            isFirst = false
+        }
+        const {phone, type: pType} = contactInfo[i]
+        innerHTML += '\n<div class="cont_details">'
+        innerHTML += `\n<div class="type">${pType}</div><div>${phone}</div>`
+        innerHTML += '\n</div>'
+        i++
     }
-    if (addr2.length > 0) {
-        innerHTML += `${addr2}<br>`
+    
+    isFirst = true
+    while (contactInfo.length > i && "email" in contactInfo[i]) {
+        if (isFirst) {
+            innerHTML += '\n<div class="cont_sect">Email</div>'
+            isFirst = false
+        }
+        const {email, type: eType} = contactInfo[i]
+        innerHTML += '\n<div class="cont_details">'
+        innerHTML += `\n<div class="type">${eType}</div><div><a href="mailto:${email}">${email}</a></div>`
+        innerHTML += '\n</div>'
+        i++
     }
-    innerHTML += `${city}, ${state} ${zip}</div>`
-    innerHTML += '\n</div>'
-
-    // for (let i = 1; i < contactInfo; i++) {}
-    //     
-    // }
+    
+    isFirst = true
+    while (contactInfo.length > i && "addr1" in contactInfo[i]) {
+        if (isFirst) {
+            innerHTML += '\n<div class="cont_sect">Address</div>'
+            isFirst = false
+        }
+        const {addr1, addr2, city, state, zip, type: aType} = contactInfo[i]
+        innerHTML += '\n<div class="cont_details">'
+        
+        let addrHref = ''
+        let addrInnerHTML = ''
+        if (addr1.length > 0) {
+            addrHref += addr1
+            addrInnerHTML += `${addr1}<br>`
+        }
+        if (addr2.length > 0) {
+            if (addrHref.length > 0) {
+                addrHref += ', '
+            }
+            addrHref += addr2
+            addrInnerHTML += `${addr2}<br>`
+        }
+        if (city.length > 0) {
+            if (addrHref.length > 0) {
+                addrHref += ', '
+            }
+            addrHref += city
+            addrInnerHTML += city
+            if (state.length > 0 || zip.length > 0) {
+                addrInnerHTML += ', '
+            }
+        }
+        if (state.length > 0) {
+            if (addrHref.length > 0) {
+                addrHref += ', '
+            }
+            addrHref += state
+            addrInnerHTML += state
+            if (zip.length > 0) {
+                addrInnerHTML += ' '
+            }
+        }
+        if (zip.length > 0) {
+            if (addrHref.length > 0) {
+                addrHref += ' '
+            }
+            addrHref += zip
+            addrInnerHTML += zip
+        }
+        innerHTML += `\n<div class="type">${aType}</div><div><a href="https://www.google.com/maps/place/${addrHref}">${addrInnerHTML}</a></div>`
+        innerHTML += '\n</div>'
+        i++
+    }
 
     if (note.length > 0) {
         innerHTML += '\n<div class="cont_sect">Note</div>'
@@ -225,7 +254,11 @@ function showContactDisp() {
 
 function makeSelect(name, types, typeId) {
     let innerHTML = `<select name="${name}">\n`
-    innerHTML += '<option value="0">- type -</option>\n'
+    if (typeId === 0) {
+        innerHTML += '<option value="0">- type -</option>\n'
+    } else {
+        innerHTML += '<option value="0">- delete -</option>\n'
+    }
     for (let type of types) {
         innerHTML += `<option value="${type.id}"`
         if (type.id === typeId) {
@@ -234,6 +267,34 @@ function makeSelect(name, types, typeId) {
         innerHTML += `>${type.type}</option>\n`
     }
     innerHTML += '</select>'
+    return innerHTML
+}
+
+function makePhoneItem(phoneId,phone,pTypeId) {
+    let innerHTML = '\n<div class="cont_details">'
+    innerHTML += `\n<input type="hidden" name="phone_id" value="${phoneId}">`
+    innerHTML += `\n<div class="type">${makeSelect('ptype_id', pTypes, pTypeId)}</div><input type="text" class="data" name="phone" placeholder="phone" value="${phone}">`
+    innerHTML += '\n</div>'
+    return innerHTML
+}
+
+function makeEmailItem(emailId,email,eTypeId) {
+    let innerHTML = '\n<div class="cont_details">'
+    innerHTML += `\n<input type="hidden" name="email_id" value="${emailId}">`
+    innerHTML += `\n<div class="type">${makeSelect('etype_id', eTypes, eTypeId)}</div><input type="email" class="data" name="email" placeholder="email" value="${email}">`
+    innerHTML += '\n</div>'
+    return innerHTML
+}
+
+function makeAddrItem(addrId,addr1,addr2,city,state,zip,aTypeId) {
+    let innerHTML = '\n<div class="cont_details">'
+    innerHTML += `\n<input type="hidden" name="addr_id" value="${addrId}">`
+    innerHTML += `\n<div class="type">${makeSelect('atype_id', aTypes, aTypeId)}</div><div>`
+    innerHTML += `\n<input type="text" class="data" name="addr1" placeholder="street" value="${addr1}"><br>`
+    innerHTML += `\n<input type="text" class="data" name="addr2" placeholder="street" value="${addr2}"><br>`
+
+    innerHTML += `\n<input type="text" class="city" name="city" placeholder="city" value="${city}">, <input type="text" class="state" name="state" placeholder="state" value="${state}"> <input type="text" class="zip" name="zip" placeholder="zip" value="${zip}"></div>`
+    innerHTML += '\n</div>'
     return innerHTML
 }
 
@@ -249,47 +310,50 @@ function showContactAddEdit(titleText) {
     let innerHTML = ''
 
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">first</div><input type="text" class="data" name="fname" value="${fname}">`
+    innerHTML += `\n<div class="type">first</div><input type="text" class="data" name="fname" placeholder="first" value="${fname}">`
     innerHTML += '\n</div>'
     innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<div class="type">last</div><input type="text" class="data" name="lname" value="${lname}">`
+    innerHTML += `\n<div class="type">last</div><input type="text" class="data" name="lname" placeholder="last" value="${lname}">`
     innerHTML += '\n</div>'
 
     if (company.length > 0) {
         innerHTML += `\n<div>${company}</div>`
     }
 
+    let i = 1
+    console.log("look for phone, i:", i, "contactInfo.length:", contactInfo.length)
     innerHTML += '\n<div class="cont_sect">Phone</div>'
-    const {phone_id: phoneId, phone, type_id: pTypeId} = contactInfo[1]
-    innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<input type="hidden" name="phone_id" value="${phoneId}">`
-    innerHTML += `\n<div class="type">${makeSelect('ptype_id', pTypes, pTypeId)}</div><input type="text" class="data" name="phone" value="${phone}">`
-    innerHTML += '\n</div>'
-
+    while (contactInfo.length > i && "phone" in contactInfo[i]) {
+        const {phone_id: phoneId, phone, type_id: pTypeId} = contactInfo[1]
+        innerHTML += makePhoneItem(phoneId,phone,pTypeId)
+        i++
+    }
+    innerHTML += makePhoneItem(0,'',0)
+    
+    console.log("look for email, i:", i, "contactInfo.length:", contactInfo.length)
     innerHTML += '\n<div class="cont_sect">Email</div>'
-    const {email_id: emailId, email, type_id: eTypeId} = contactInfo[2]
-    innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<input type="hidden" name="email_id" value="${emailId}">`
-    innerHTML += `\n<div class="type">${makeSelect('etype_id', eTypes, eTypeId)}</div><input type="email" class="data" name="email" value="${email}">`
-    innerHTML += '\n</div>'
-
+    while (contactInfo.length > i && "email" in contactInfo[i]) {
+        const {email_id: emailId, email, type_id: eTypeId} = contactInfo[i]
+        innerHTML += makeEmailItem(emailId,email,eTypeId)
+        i++
+    }
+    innerHTML += makeEmailItem(0,'',0)
+    
+    console.log("look for addr1, i:", i, "contactInfo.length:", contactInfo.length)
     innerHTML += '\n<div class="cont_sect">Address</div>'
-    const {address_id: addrId, addr1, addr2, city, state, zip, type_id: aTypeId} = contactInfo[3]
-    innerHTML += '\n<div class="cont_details">'
-    innerHTML += `\n<input type="hidden" name="addr_id" value="${addrId}">`
-    innerHTML += `\n<div class="type">${makeSelect('atype_id', aTypes, aTypeId)}</div><div>`
-    innerHTML += `\n<input type="text" class="data" name="addr1" value="${addr1}"><br>`
-    innerHTML += `\n<input type="text" class="data" name="addr2" value="${addr2}"><br>`
-
-    innerHTML += `\n<input type="text" class="city" name="city" value="${city}">, <input type="text" class="state" name="state" value="${state}"> <input type="text" class="zip" name="zip" value="${zip}"></div>`
-    innerHTML += '\n</div>'
+    while (contactInfo.length > i && "addr1" in contactInfo[i]) {
+        const {address_id: addrId, addr1, addr2, city, state, zip, type_id: aTypeId} = contactInfo[i]
+        innerHTML += makeAddrItem(addrId,addr1,addr2,city,state,zip,aTypeId)
+        i++
+    }
+    innerHTML += makeAddrItem(0,'','','','','',0)
 
     // for (let i = 1; i < contactInfo; i++) {}
     //     
     // }
 
     innerHTML += '\n<div class="cont_sect">Note</div>'
-    innerHTML += `\n<textarea rows="10" name="note">${note}</textarea>`
+    innerHTML += `\n<textarea rows="10" name="note" placeholder="note">${note}</textarea>`
 
     main.innerHTML = innerHTML
 }

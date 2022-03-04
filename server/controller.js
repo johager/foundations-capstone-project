@@ -54,9 +54,20 @@ module.exports = {
                 const contId = dbRes[0][0].contact_id
                 console.log("putContact then1 contId:", contId)
 
-                let qry = `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[0]}, '${phones[0]}', 1);`
-                qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[0]}, '${emails[0]}', 1);`
-                qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[0]}, '${addr1s[0]}', '${addr2s[0]}', '${cities[0]}', '${states[0]}', '${zips[0]}', 1);`
+                let qry = ''
+
+                for(let i in phones) {
+                    qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', 1);`
+                }
+
+                for(let i in emails) {
+                    qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', 1);`
+                }
+
+                for(let i in addr1s) {
+                    qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', 1);`
+                }
+
                 qry += contactQuery(contId)
                 console.log("putContact then1 qry:", qry)
 
@@ -79,9 +90,43 @@ module.exports = {
         console.log("putContact addrIds:", addrIds)
 
         let qry = `update contacts set fname='${fname}', lname='${lname}', note='${note}' where contact_id=${contId};`
-        qry += `update phones set type_id=${pTypeIds[0]}, phone='${phones[0]}' where phone_id=${phoneIds[0]};`
-        qry += `update emails set type_id=${eTypeIds[0]}, email='${emails[0]}' where email_id=${emailIds[0]};` 
-        qry += `update addresses set type_id=${aTypeIds[0]}, addr1='${addr1s[0]}', addr2='${addr2s[0]}', city='${cities[0]}', state='${states[0]}', zip='${zips[0]}' where address_id=${addrIds[0]};`
+
+        for(let i in phones) {
+            if (phoneIds[i] > 0) {
+                if (pTypeIds[i] > 0 && phones[i].length > 0) {
+                    qry += `update phones set type_id=${pTypeIds[i]}, phone='${phones[i]}' where phone_id=${phoneIds[i]};`
+                } else {
+                    qry += `delete from phones where phone_id=${phoneIds[i]};`
+                }
+            } else if (phones[i].length > 0) {
+                qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', ${i + 1});`
+            }
+        }
+
+        for(let i in emails) {
+            if (emailIds[i] > 0) {
+                if (eTypeIds[i] > 0 && emails[i].length > 0) {
+                    qry += `update emails set type_id=${eTypeIds[i]}, email='${emails[i]}' where email_id=${emailIds[i]};`
+                } else {
+                    qry += `delete from emails where email_id=${emailIds[i]};`
+                }
+            } else if (emails[i].length > 0) {
+                qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', ${i + 1});`
+            }
+        }
+
+        for(let i in addr1s) {
+            if (addrIds[i] > 0) {
+                if (aTypeIds[i] > 0 && (addr1s[i].length > 0 || addr2s[i].length > 0 || states[i].length > 0 || cities[i].length > 0 || zips[i].length > 0)) {
+                    qry += `update addresses set type_id=${aTypeIds[i]}, addr1='${addr1s[i]}', addr2='${addr2s[i]}', city='${cities[i]}', state='${states[i]}', zip='${zips[i]}' where address_id=${addrIds[i]};`
+                } else {
+                    qry += `delete from addresses where address_id=${addrIds[i]};`
+                }
+            } else if (addr1s[i].length > 0 || addr2s[i].length > 0 || states[i].length > 0 || cities[i].length > 0 || zips[i].length > 0) {
+                qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', ${i + 1});`
+            }
+        }
+
         qry += contactQuery(contId)
         console.log("putContact qry:", qry)
 
