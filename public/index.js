@@ -171,8 +171,9 @@ function showContactDisp() {
             isFirst = false
         }
         const {phone, type: pType} = contactInfo[i]
+        const pHref = phone.replace(/[^0-9.]/g, '')
         innerHTML += '\n<div class="cont_details">'
-        innerHTML += `\n<div class="type">${pType}</div><div>${phone}</div>`
+        innerHTML += `\n<div class="type">${pType}</div><div><a href="tel:${pHref}">${phone}</a></div>`
         innerHTML += '\n</div>'
         i++
     }
