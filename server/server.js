@@ -14,7 +14,11 @@ app.get('/', (req,res) => {
 
 app.use(express.static(path.join(__dirname, '../public')))
 
-const {getContact, postContact, putContact, deleteContact, getAllContacts, getTypeArrays} = require('./controller.js')
+const {createUser, checkUser, getContact, postContact, putContact, deleteContact, getAllContacts, getTypeArrays} = require('./controller.js')
+
+// login
+app.post('/api/createuser', createUser)
+app.post('/api/checkuser', checkUser)
 
 // contact
 app.get('/api/contact', getContact)

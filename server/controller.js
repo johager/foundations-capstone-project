@@ -10,6 +10,17 @@ const sequelize = new Sequelize(process.env.CONNECTION_STRING, {
     }
 })
 
+const bcrypt = require('bcryptjs')
+
+function passHashToSave(passHash) {
+    // replace "$" with "|" so sequelize can use it
+    return passHash.replace(/[$]/g,'|')
+}
+function passHashToUse(passHash) {
+    // replace "|" with "$" so bcrypt can use it
+    return passHash.replace(/[|]/g,'$')
+}
+
 function contactsQuery(userId) {
     return `select contact_id, fname, lname from contacts where user_id=${userId} order by lname, fname, contact_id`
 }
@@ -23,6 +34,66 @@ function contactQuery(contId) {
 }
 
 module.exports = {
+    //
+    // === user ===
+    ///
+    createUser: (req, res) => {
+        console.log("createUser")
+
+        const {name, email, passwd} = req.body
+
+        qry = `select user_id, name, passwd from users where email='${email}';`
+        console.log("createUser qry:", qry)
+        sequelize.query(qry)
+        .then(dbRes => {
+            if (dbRes[0].length > 0) {  // email exists
+                const {user_id, name, passwd: passHash} = dbRes[0][0]
+                if (bcrypt.compareSync(passwd, passHashToUse(passHash))) {  // passwd matches
+                    res.status(200).send({userId: user_id, name: name})
+                } else {  // passwd doesn't match
+                    res.status(200).send({userId: -1})
+                }
+            } else {  // create new user
+                const salt = bcrypt.genSaltSync(9)
+                const passHash = bcrypt.hashSync(passwd, salt)
+                const passHashSave = passHashToSave(passHash)
+                let qry = `insert into users (name, email, passwd) values ('${name}','${email}', '${passHashSave}') returning user_id;`
+                console.log("createUser qry:", qry)
+                sequelize.query(qry)
+                .then(dbRes => {
+                    const {user_id} = dbRes[0][0]
+                    res.status(200).send({userId: user_id, name: name})
+                })
+                .catch(err => console.log(err))
+            }
+        })
+        .catch(err => console.log(err))
+    },
+    checkUser: (req, res) => {
+        console.log("checkUser")
+        const {email, passwd} = req.body
+        console.log("checkUser  email:", email)
+        console.log("checkUser passwd:", passwd)
+        let qry = `select user_id, name, passwd from users where email='${email}';`
+        console.log("checkUser qry:", qry)
+        sequelize.query(qry)
+        .then(dbRes => {
+            console.log("checkUser then dbRes[0]:", dbRes[0])
+            if (dbRes[0].length > 0) {  // email exists
+                const {user_id, name, passwd: passHash} = dbRes[0][0]
+                console.log("checkUser  user_id:", user_id)
+                console.log("checkUser     name:", name)
+                console.log("checkUser passHash:", passHash)
+                if (bcrypt.compareSync(passwd, passHashToUse(passHash))) {  // passwd matches
+                    console.log("checkUser  email:", email)
+                    res.status(200).send({userId: user_id, name: name})
+                    return
+                }
+            }
+            res.status(200).send({userId: -1})
+        })
+        .catch(err => console.log(err))
+    },
     //
     // === contact ===
     //
@@ -43,33 +114,37 @@ module.exports = {
         const {fname, lname, pTypeIds, phones, eTypeIds, emails, aTypeIds, addr1s, addr2s, cities, states, zips, note} = req.body
 
         let qry = `insert into contacts (user_id, fname, lname, note) values(${userId}, '${fname}', '${lname}', '${note}') returning contact_id`
-        console.log("putContact qry:", qry)
-
-        // res.status(200)
+        console.log("postContact qry:", qry)
 
         sequelize.query(qry)
             .then(dbRes => {
-                console.log("putContact then1 dbRes[0]:", dbRes[0])
-                console.log("putContact then1 dbRes[0][0]:", dbRes[0][0])
+                console.log("postContact then1 dbRes[0]:", dbRes[0])
+                console.log("postContact then1 dbRes[0][0]:", dbRes[0][0])
                 const contId = dbRes[0][0].contact_id
-                console.log("putContact then1 contId:", contId)
+                console.log("postContact then1 contId:", contId)
 
                 let qry = ''
 
                 for(let i in phones) {
-                    qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', 1);`
+                    if (pTypeIds[i] > 0 && phones[i].length > 0) {
+                        qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', 1);`
+                    }
                 }
 
                 for(let i in emails) {
-                    qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', 1);`
+                    if (eTypeIds[i] > 0 && emails[i].length > 0) {
+                        qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', 1);`
+                    }
                 }
 
                 for(let i in addr1s) {
-                    qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', 1);`
+                    if (aTypeIds[i] > 0 && (addr1s[i].length > 0 || addr2s[i].length > 0 || states[i].length > 0 || cities[i].length > 0 || zips[i].length > 0)) {
+                        qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', 1);`
+                    }
                 }
 
                 qry += contactQuery(contId)
-                console.log("putContact then1 qry:", qry)
+                console.log("postContact then1 qry:", qry)
 
                 sequelize.query(qry)
                     .then(dbRes => res.status(200).send(dbRes[0]))
@@ -85,9 +160,12 @@ module.exports = {
 
         const {fname, lname, phoneIds, pTypeIds, phones, emailIds, eTypeIds, emails, addrIds, aTypeIds, addr1s, addr2s, cities, states, zips, note} = req.body
 
+        const noteE = sequelize.escape(note)
         console.log("putContact phoneIds:", phoneIds)
         console.log("putContact emailIds:", emailIds)
         console.log("putContact addrIds:", addrIds)
+        console.log("putContact  note: === === ===\n", note,"\n=== === ===")
+        console.log("putContact noteE: === === ===\n", noteE,"\n=== === ===")
 
         let qry = `update contacts set fname='${fname}', lname='${lname}', note='${note}' where contact_id=${contId};`
 
@@ -104,6 +182,7 @@ module.exports = {
         }
 
         for(let i in emails) {
+            console.log(`putContact emails[${i}], emailIds[i]:`, emailIds[i], "eTypeIds[i]:", eTypeIds[i], "emails[i]:", emails[i])
             if (emailIds[i] > 0) {
                 if (eTypeIds[i] > 0 && emails[i].length > 0) {
                     qry += `update emails set type_id=${eTypeIds[i]}, email='${emails[i]}' where email_id=${emailIds[i]};`

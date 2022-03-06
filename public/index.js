@@ -1,4 +1,4 @@
-const userId = 1
+let userId = -1
 console.log("userId:", userId)
 
 let contId = 0
@@ -12,6 +12,10 @@ const title = document.getElementById('title')
 const leftNav = document.getElementById('left')
 const rightNav = document.getElementById('right')
 const content = document.querySelector('.content')
+
+const loginAside = document.querySelector('aside')
+const loginBtn = document.getElementById('login_btn')
+const signUpLink = document.querySelector('form').querySelector('a')
 
 //
 // === nav ===
@@ -28,6 +32,148 @@ function doLeftNavAction(evt) {
 function doRightNavAction(evt) {
     console.log("doRightNavAction() === === ===")
     rightNavAction()
+}
+
+//
+// === login ===
+//
+
+function setLoginAside(innerHTML) {
+    console.log("setLoginAside(innerHTML) === === ===")
+    loginAside.style.visibility = 'visible'
+    loginAside.innerHTML = innerHTML
+}
+
+function clearLoginAside() {
+    loginAside.style.visibility = 'hidden'
+    loginAside.textContent = ''
+}
+
+function getLoginInputs() {
+    return document.querySelectorAll('input')
+}
+
+function doLogin(name) {
+    console.log("doLogin(name) === === ===")
+    console.log("doLogin name:", name)
+
+    clearLoginAside()
+
+    const inputs = document.querySelectorAll('input')
+    for (let input of inputs) {
+        input.value = ''
+    }
+
+    inputs[0].style.visibility = 'hidden'
+    inputs[3].style.display = 'none'
+    loginBtn.textContent = 'Login'
+    signUpLink.style.display = 'inline'
+
+    document.getElementById('login_view').style.display = 'none'
+
+    document.querySelector('.top_header').firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
+    document.getElementById('logout').addEventListener('click', handleLogout)
+
+    showAllContacts()
+    getTypeArrays()
+}
+
+function handleCreateUser(inputs) {
+    console.log("handleCreateUser() === === ===")
+
+    if (inputs.passwd != inputs.passwd2) {
+        setLoginAside(`The passwords don't match.<br>Please try again.`)
+        return
+    }
+
+    clearLoginAside()
+
+    delete inputs.passwd2
+
+    axios.post(`/api/createuser`, inputs)
+    .then(res => {
+        console.log("handleLogin then res.data:", res.data)
+        if(res.data.userId < 0) {
+            console.log("handleCreateUser - exist")
+            loginAside.style.visibility = 'visible'
+            loginAside.innerHTML = `An account already exists for that email.`
+        } else {
+            console.log("handleCreateUser - user exists")
+            userId = res.data.userId
+            console.log("handleCreateUser userId:", userId)
+            doLogin(res.data.name)
+        }
+    })
+    .catch(err => console.log(err))
+}
+
+function handleLogin(inputs) {
+    console.log("handleLogin() === === ===")
+
+    delete inputs.name
+    delete inputs.passwd2
+    console.log("handleLoginButton inputs:", inputs)
+    
+    axios.post(`/api/checkuser`, inputs)
+    .then(res => {
+        console.log("handleLogin then res.data:", res.data)
+        if(res.data.userId < 0) {
+            console.log("handleLoginButton - user doesn't exist")
+            setLoginAside(`That login is incorrect.<br>Please try again.`)
+        } else {
+            console.log("handleLoginButton - user exists")
+            userId = res.data.userId
+            console.log("handleLoginButton userId:", userId)
+            doLogin(res.data.name)
+        }
+    })
+    .catch(err => console.log(err))
+}
+
+function handleLoginButton(evt) {
+    console.log("handleLoginButton(evt) === === ===")
+    evt.preventDefault()
+
+    clearLoginAside()
+    
+    const inputs = {}
+    
+    for (let input of getLoginInputs()) {
+        inputs[input.name] = input.value
+    }
+    console.log("handleLoginButton inputs:", inputs)
+    
+    if (evt.target.textContent === 'Login') {
+        handleLogin(inputs)
+    } else {
+        handleCreateUser(inputs)
+    }
+}
+
+function handleSignUpLink(evt) {
+    console.log("handleSignUpLink(evt) === === ===")
+    clearLoginAside()
+    const inputs = getLoginInputs()
+    inputs[0].style.visibility = 'visible'
+    inputs[3].style.display = 'block'
+    loginBtn.textContent = 'Create Account'
+    signUpLink.style.display = 'none'
+}
+
+//
+// === logout ===
+//
+
+function handleLogout(evt) {
+    console.log("handleLogout(evt) === === ===")
+
+    userId = -1
+    contId = 0
+    contactInfo = []
+
+    document.getElementById('login_view').style.display = 'block'
+    document.querySelector('.top_header').firstChild.innerHTML = ''
+    content.innerHTML = ''
 }
 
 //
@@ -64,16 +210,17 @@ function showEditContact() {
 function contactObjForAdd() {
 
     const pTypeIds = []
-    document.getElementsByName('ptype_id').forEach(ele => pTypeIds.push(ele.value))
+    document.getElementsByName('ptype_id').forEach(ele => pTypeIds.push(+ele.value))
     const eTypeIds = []
-    document.getElementsByName('etype_id').forEach(ele => eTypeIds.push(ele.value))
+    document.getElementsByName('etype_id').forEach(ele => eTypeIds.push(+ele.value))
     const aTypeIds = []
-    document.getElementsByName('atype_id').forEach(ele => aTypeIds.push(ele.value))
+    document.getElementsByName('atype_id').forEach(ele => aTypeIds.push(+ele.value))
 
     const phones = []
     document.getElementsByName('phone').forEach(ele => phones.push(ele.value.trim()))
     const emails = []
     document.getElementsByName('email').forEach(ele => emails.push(ele.value.trim()))
+    
     const addr1s = []
     document.getElementsByName('addr1').forEach(ele => addr1s.push(ele.value.trim()))
     const addr2s = []
@@ -84,6 +231,8 @@ function contactObjForAdd() {
     document.getElementsByName('state').forEach(ele => states.push(ele.value.trim()))
     const zips = []
     document.getElementsByName('zip').forEach(ele => zips.push(ele.value.trim()))
+
+    emails.shift()  // remove the login email
 
     const contactObj = {
         fname: document.getElementsByName('fname')[0].value.trim(),
@@ -125,11 +274,11 @@ function updateContact() {
     const contactObj = contactObjForAdd()
 
     const phoneIds = []
-    document.getElementsByName('phone_id').forEach(ele => phoneIds.push(ele.value))
+    document.getElementsByName('phone_id').forEach(ele => phoneIds.push(+ele.value))
     const emailIds = []
-    document.getElementsByName('email_id').forEach(ele => emailIds.push(ele.value))
+    document.getElementsByName('email_id').forEach(ele => emailIds.push(+ele.value))
     const addrIds = []
-    document.getElementsByName('addr_id').forEach(ele => addrIds.push(ele.value))
+    document.getElementsByName('addr_id').forEach(ele => addrIds.push(+ele.value))
 
     contactObj.phoneIds = phoneIds
     contactObj.emailIds = emailIds
@@ -297,7 +446,7 @@ function makeAddrItem(addrId,addr1,addr2,city,state,zip,aTypeId) {
     innerHTML += `\n<div class="type_edit">${makeSelect('atype_id', aTypes, aTypeId)}</div><div>`
     innerHTML += `\n<input type="text" class="data" name="addr1" placeholder="street" value="${addr1}"><br>`
     innerHTML += `\n<input type="text" class="data" name="addr2" placeholder="street" value="${addr2}"><br>`
-    innerHTML += `\n<input type="text" class="city" name="city" placeholder="city" value="${city}"><br>`
+    innerHTML += `\n<input type="text" class="data" name="city" placeholder="city" value="${city}"><br>`
     innerHTML +=  `\n<input type="text" class="state" name="state" placeholder="state" value="${state}"><br>`
     innerHTML += `\n<input type="text" class="zip" name="zip" placeholder="zip" value="${zip}"></div>`
     innerHTML += '\n</div>'
@@ -422,6 +571,7 @@ function delContact(evt) {
 
 function showAllContacts() {
     console.log("showAllContacts get userId:", userId)
+    // content.innerHTML = 'Contacts'
     axios.get(`/api/contacts?id=${userId}`)
     .then(res => {
         console.log("showAllContacts then res.body:", res.data)
@@ -464,8 +614,14 @@ function getTypeArrays() {
     .catch(err => console.log(err))
 }
 
+loginBtn.addEventListener('click', handleLoginButton)
+signUpLink.addEventListener('click', handleSignUpLink)
+
 leftNav.addEventListener('click', doLeftNavAction)
 rightNav.addEventListener('click', doRightNavAction)
 
-showAllContacts()
-getTypeArrays()
+if (userId > 0 ) {
+    doLogin('James')
+}
+// showAllContacts()
+// getTypeArrays()

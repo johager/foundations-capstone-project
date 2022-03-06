@@ -8,9 +8,23 @@
     <link rel="stylesheet" href="index.css" type='text/css' >
 </head>
 <body>
-    <header class="top_header"><div class="header_footer">Welcome, James</div></header>
+    <header class="top_header"><div></div></header>
     <main>
-        <section>
+        <section id="login_view">
+            <h1>Contacts</h1>
+            <aside></aside>
+            <form>
+                <input type="text" name="name" placeholder="name">
+                <input type="email" name="email" placeholder="email">
+                <input type="password" name="passwd" placeholder="password">
+                <input type="password" name="passwd2" placeholder="password again">
+                <div>
+                    <button id="login_btn">Login</button>
+                    <p><a>Sign up by creating an account</a></p>
+                </div>
+            </form>
+        </section>
+        <section id="contacts_view">
             <header class="subheader">
                 <div id="title">Contacts</div>
                 <nav><button id="left"></button><button id="right">Add</button></nav>
@@ -18,7 +32,7 @@
             <div class="content"></div>
         </section>
     </main>
-    <footer><div class="header_footer">&copy; 2022 James Hager</div></footer>
+    <footer>&copy; 2022 James Hager</footer>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="index.js"></script>
 </body>
