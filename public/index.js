@@ -49,6 +49,16 @@ console.log(`contactsView.style.display: '${contactsView.style.display}'`)
 console.log(` contactView.style.display: '${contactView.style.display}'`)
 
 //
+// === misc ===
+//
+
+function clearTSelects() {
+    pSelect = null
+    eSelect = null
+    aSelect = null
+}
+
+//
 // === nav ===
 //
 
@@ -72,25 +82,25 @@ function doContactRightNavAction(evt) {
     contactRightNavAction()
 }
 
-function contactsViewIsHidden() {
-    console.log("contactsViewIsHidden() === === ===")
-    // return contactsView.style.display === 'none'
-    const isHidden = contactsView.style.display === 'none'
-    console.log("isHidden:", isHidden)
-    console.log(" display:", contactsView.style.display)
-    console.log("   style:", contactsView.style)
-    return isHidden
-}
+// function contactsViewIsHidden() {
+//     console.log("contactsViewIsHidden() === === ===")
+//     // return contactsView.style.display === 'none'
+//     const isHidden = contactsView.style.display === 'none'
+//     console.log("isHidden:", isHidden)
+//     console.log(" display:", contactsView.style.display)
+//     console.log("   style:", contactsView.style)
+//     return isHidden
+// }
 
-function contactViewIsHidden() {
-    console.log("contactViewIsHidden() === === ===")
-    // return contactView.style.display === 'none'
-    const isHidden = contactView.style.display === 'none'
-    console.log("isHidden:", isHidden)
-    console.log(" display:", contactView.style.display)
-    console.log("   style:", contactView.style)
-    return isHidden
-}
+// function contactViewIsHidden() {
+//     console.log("contactViewIsHidden() === === ===")
+//     // return contactView.style.display === 'none'
+//     const isHidden = contactView.style.display === 'none'
+//     console.log("isHidden:", isHidden)
+//     console.log(" display:", contactView.style.display)
+//     console.log("   style:", contactView.style)
+//     return isHidden
+// }
 
 function showLoginView() {
     console.log("showLoginView() === === ===")
@@ -284,7 +294,7 @@ function handleSignUpLink(evt) {
 
 function handleLogout(evt) {
     console.log("handleLogout(evt) === === ===")
-
+    
     showLoginView()
     hideContactsView()
     hideContactView()
@@ -292,13 +302,19 @@ function handleLogout(evt) {
     userId = -1
     groups = []
     contacts = []
-    contId = 0
+    contId = -1
     contactInfo = []
     contactInfoDisplayed = []
 
     mainheader.firstChild.innerHTML = ''
     contactsContent.innerHTML = ''
     contactContent.innerHTML = ''
+
+    contactTitle.textContent = ''
+    contactLeftNav.textContent = ''
+    contactRightNav.textContent = ''
+
+    clearTSelects()
 }
 
 //
@@ -325,6 +341,9 @@ function showAddContact() {
         }
     ]
 
+    contactsLeftNav.textContent = ''
+    contactsRightNav.textContent = ''
+
     if (mainheader.offsetWidth > 600) {
         if (contId < 0 ) {
             contactLeftNavAction = showContactDispNoContact
@@ -337,6 +356,11 @@ function showAddContact() {
 
     contactRightNavAction = addContact
     showContactAddEdit('Add')
+}
+
+function setDefaultContactsNav() {
+    contactsLeftNav.textContent = 'Edit'
+    contactsRightNav.textContent = 'Add'
 }
 
 function showEditContact() {
@@ -434,19 +458,19 @@ function updateContact() {
 
 function showContactDispNoContact() {
     console.log("showContactDispNoContact() === === ===")
-    
+
+    setDefaultContactsNav()
     contactTitle.textContent = ''
     contactLeftNav.textContent = ''
     contactRightNav.textContent = ''
     contactContent.innerHTML = ''
-    pSelect = null
-    eSelect = null
-    aSelect = null
+    clearTSelects()
 }
 
 function showContactDisplayed() {
     console.log("showContactDisplayed() === === ===")
 
+    setDefaultContactsNav()
     contactInfo = contactInfoDisplayed
     showContactDisp()
 }
@@ -454,9 +478,7 @@ function showContactDisplayed() {
 function showContactDisp() {
     console.log("showContactDisp() === === ===")
 
-    pSelect = null
-    eSelect = null
-    aSelect = null
+    clearTSelects()
 
     switchToContactView()
 
@@ -693,6 +715,8 @@ function handleASelectChanged(evt) {
 function showContactAddEdit(titleText) {
     console.log("showContactAddEdit() === === ===")
 
+    switchToContactView()
+
     const {fname, lname, company, note} = contactInfo[0]
 
     contactTitle.textContent = titleText
@@ -784,7 +808,6 @@ function makeGroupSelect() {
     groupSelect.innerHTML = innerHTML
 }
 
-
 function doShowContacts() {
     console.log("showContacts(contacts) === === ===")
 
@@ -793,7 +816,7 @@ function doShowContacts() {
     contactsLeftNav.textContent = 'Edit'
     contactsRightNav.textContent = 'Add'
 
-    contactsLeftNavAction = editContacts
+    contactsLeftNavAction = doEditContacts
 
     contactsContent.innerHTML = ''
     for (let contact of contacts) {
@@ -828,7 +851,7 @@ function delContact(evt) {
     axios.delete(`/api/contact?cont_id=${evt.target.id}&user_id=${userId}`)
     .then(res => {
         console.log("delContact then res.body:", res.data)
-        showContacts(res.data)
+        editContacts(res.data)
     })
     .catch(err => console.log(err))
 }
@@ -836,9 +859,8 @@ function delContact(evt) {
 function getContacts() {
     console.log("getContacts get userId:", userId)
 
-    pSelect = null
-    eSelect = null
-    aSelect = null
+    setDefaultContactsNav()
+    clearTSelects()
 
     // contactsContent.innerHTML = 'Contacts'
     axios.get(`/api/contacts?id=${userId}&group=${groupIdDisplayed}`)
@@ -851,11 +873,17 @@ function getContacts() {
 
 function doneEditContacts(evt) {
     console.log("doneEditContacts(evt) === === ===")
-    getContacts()
+    doShowContacts()
 }
 
-function editContacts(evt) {
+function editContacts(contactsToSet) {
     console.log("editContacts(evt) === === ===")
+    contacts = contactsToSet
+    doEditContacts()
+}
+
+function doEditContacts() {
+    console.log("editContacts() === === ===")
 
     contactsLeftNav.textContent = 'Done'
     contactsRightNav.textContent = ''
