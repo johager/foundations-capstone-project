@@ -1,37 +1,127 @@
-let userId = -1
+let userId = 1
 console.log("userId:", userId)
+
+let groupIdDisplayed = 0
+let groups = []
 
 let contId = 0
 let contactInfo = []
+let contactInfoDisplayed = []
 
 const pTypes = []
 const eTypes = []
 const aTypes = []
 
-const title = document.getElementById('title')
-const leftNav = document.getElementById('left')
-const rightNav = document.getElementById('right')
-const content = document.querySelector('.content')
+const mainheader = document.querySelector('.mainheader')
 
 const loginAside = document.querySelector('aside')
 const loginBtn = document.getElementById('login_btn')
 const signUpLink = document.querySelector('form').querySelector('a')
 
+const loginView = document.getElementById('login_view')
+const contactsView = document.getElementById('contacts_view')
+const contactView = document.getElementById('contact_view')
+
+const contactTitle = document.getElementById('contact_title')
+const contactLeftNav = document.getElementById('contact_left_nav')
+const contactRightNav = document.getElementById('contact_right_nav')
+
+const groupSelect = document.getElementById('groups')
+
+const contactsContent = document.getElementById('contacts_content')
+const contactContent = document.getElementById('contact_content')
+
+console.log("   loginView.style:", loginView.style)
+console.log("contactsView.style:", contactsView.style)
+console.log(" contactView.style:", contactView.style)
+
+console.log(`   loginView.style.display: '${loginView.style.display}'`)
+console.log(`contactsView.style.display: '${contactsView.style.display}'`)
+console.log(` contactView.style.display: '${contactView.style.display}'`)
+
 //
 // === nav ===
 //
 
-let leftNavAction = () => {}
-let rightNavAction = () => {}
+let contactLeftNavAction = () => {}
+let contactRightNavAction = () => {}
 
-function doLeftNavAction(evt) {
-    console.log("doLeftNavAction() === === ===")
-    leftNavAction()
+function doContactLeftNavAction(evt) {
+    console.log("doContactLeftNavAction() === === ===")
+    contactLeftNavAction()
 }
 
-function doRightNavAction(evt) {
-    console.log("doRightNavAction() === === ===")
-    rightNavAction()
+function doContactRightNavAction(evt) {
+    console.log("doContactRightNavAction() === === ===")
+    contactRightNavAction()
+}
+
+function contactsViewIsHidden() {
+    console.log("contactsViewIsHidden() === === ===")
+    // return contactsView.style.display === 'none'
+    const isHidden = contactsView.style.display === 'none'
+    console.log("isHidden:", isHidden)
+    console.log(" display:", contactsView.style.display)
+    console.log("   style:", contactsView.style)
+    return isHidden
+}
+
+function contactViewIsHidden() {
+    console.log("contactViewIsHidden() === === ===")
+    // return contactView.style.display === 'none'
+    const isHidden = contactView.style.display === 'none'
+    console.log("isHidden:", isHidden)
+    console.log(" display:", contactView.style.display)
+    console.log("   style:", contactView.style)
+    return isHidden
+}
+
+function showLoginView() {
+    console.log("showContactsView() === === ===")
+    loginView.style.display = 'block'
+}
+
+function hideLoginView() {
+    console.log("hideLoginView() === === ===")
+    loginView.style.display = 'none'
+}
+
+function showContactsView() {
+    console.log("showContactsView() === === ===")
+    contactsView.style.display = 'block'
+}
+
+function hideContactsView() {
+    console.log("hideContactsView() === === ===")
+    contactsView.style.display = 'none'
+}
+
+function showContactView() {
+    console.log("showContactView() === === ===")
+    contactView.style.display = 'block'
+}
+
+function hideContactView() {
+    console.log("hideContactView() === === ===")
+    contactView.style.display = 'none'
+}
+
+function switchToContactsView() {
+    console.log("switchToContactsView() === === ===")
+    if (mainheader.offsetWidth > 600) {
+        return
+    }
+    hideContactView()
+    showContactsView()
+}
+
+function switchToContactView() {
+    console.log("switchToContactView() === === ===")
+    if (mainheader.offsetWidth > 600) {
+        return
+    }
+    hideContactsView()
+    showContactView()
 }
 
 //
@@ -57,6 +147,12 @@ function doLogin(name) {
     console.log("doLogin(name) === === ===")
     console.log("doLogin name:", name)
 
+    hideLoginView()
+    showContactsView()
+    if (mainheader.offsetWidth > 600) {
+        showContactView()
+    }
+
     clearLoginAside()
 
     const inputs = document.querySelectorAll('input')
@@ -71,10 +167,11 @@ function doLogin(name) {
 
     document.getElementById('login_view').style.display = 'none'
 
-    document.querySelector('.top_header').firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
+    mainheader.firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
     document.getElementById('logout').addEventListener('click', handleLogout)
 
-    showAllContacts()
+    getContacts()
+    getGroups()
     getTypeArrays()
 }
 
@@ -167,13 +264,17 @@ function handleSignUpLink(evt) {
 function handleLogout(evt) {
     console.log("handleLogout(evt) === === ===")
 
+    showLoginView()
+    hideContactsView()
+    hideContactView()
+
     userId = -1
     contId = 0
     contactInfo = []
 
-    document.getElementById('login_view').style.display = 'block'
-    document.querySelector('.top_header').firstChild.innerHTML = ''
-    content.innerHTML = ''
+    mainheader.firstChild.innerHTML = ''
+    contactsContent.innerHTML = ''
+    contactContent.innerHTML = ''
 }
 
 //
@@ -186,8 +287,11 @@ function showContact(contactInfoIn) {
     showContactDisp()
 }
 
-function showNewContact() {
+function showAddContact() {
     console.log("showContact(contactInfoIn) === === ===")
+
+    contactInfoDisplayed = contactInfo
+
     contactInfo = [
         {
             company: '',
@@ -196,14 +300,20 @@ function showNewContact() {
             note: ''
         }
     ]
-    leftNavAction = showAllContacts
-    rightNavAction = addContact
+
+    if (mainheader.offsetWidth > 600) {
+        contactLeftNavAction = showContactDisplayed
+    } else {
+        contactLeftNavAction = getContacts
+    }
+
+    contactRightNavAction = addContact
     showContactAddEdit('Add')
 }
 
 function showEditContact() {
-    leftNavAction = showContactDisp
-    rightNavAction = updateContact
+    contactLeftNavAction = showContactDisp
+    contactRightNavAction = updateContact
     showContactAddEdit('Edit')
 }
 
@@ -294,18 +404,32 @@ function updateContact() {
     .catch(err => console.log(err))
 }
 
+function showContactDisplayed() {
+    console.log("showContactDisplayed() === === ===")
+    contactInfo = contactInfoDisplayed
+    showContactDisp()
+}
+
 function showContactDisp() {
     console.log("showContactDisp() === === ===")
+
+    switchToContactView()
 
     const {fname, lname, company} = contactInfo[0]
     const note = contactInfo[0].note.replace(/(?:\r\n|\r|\n)/g, '<br>')
 
-    title.textContent = `${fname} ${lname}`
-    leftNav.textContent = '< Contacts'
-    rightNav.textContent = 'Edit'
+    contactTitle.textContent = `${fname} ${lname}`
 
-    leftNavAction = showAllContacts
-    rightNavAction = showEditContact
+    if (mainheader.offsetWidth > 600) {
+        contactLeftNav.textContent = ''
+    } else {
+        contactLeftNav.textContent = '< Contacts'
+    }
+
+    contactRightNav.textContent = 'Edit'
+
+    contactLeftNavAction = getContacts
+    contactRightNavAction = showEditContact
 
     let innerHTML = ''
     if (company.length > 0) {
@@ -403,15 +527,15 @@ function showContactDisp() {
         innerHTML += `\n<div class="note">${note}</div>`
     }
 
-    content.innerHTML = innerHTML
+    contactContent.innerHTML = innerHTML
 }
 
 function makeSelect(name, types, typeId) {
     let innerHTML = `<select name="${name}">\n`
     if (typeId === 0) {
-        innerHTML += '<option value="0">&ndash; type &mdash;</option>\n'
+        innerHTML += '<option value="0">&ndash; type &ndash;</option>\n'
     } else {
-        innerHTML += '<option value="0">&ndash; delete &mdash;</option>\n'
+        innerHTML += '<option value="0">&ndash; delete &ndash;</option>\n'
     }
     for (let type of types) {
         innerHTML += `<option value="${type.id}"`
@@ -458,9 +582,9 @@ function showContactAddEdit(titleText) {
 
     const {fname, lname, company, note} = contactInfo[0]
 
-    title.textContent = titleText
-    leftNav.textContent = 'Cancel'
-    rightNav.textContent = 'Save'
+    contactTitle.textContent = titleText
+    contactLeftNav.textContent = 'Cancel'
+    contactRightNav.textContent = 'Save'
 
     let innerHTML = ''
 
@@ -506,7 +630,7 @@ function showContactAddEdit(titleText) {
     innerHTML += '\n<div class="cont_sect_edit">Note</div>'
     innerHTML += `\n<div class="textarea"><textarea rows="10" name="note" placeholder="note">${note}</textarea></div>`
 
-    content.innerHTML = innerHTML
+    contactContent.innerHTML = innerHTML
 }
 
 function getContact() {
@@ -524,15 +648,27 @@ function getContact() {
 // === contacts ===
 //
 
+function makeGroupSelect() {
+    let innerHTML = '<option value="0">&mdash; all groups &mdash;</option>\n'
+    for (let group of groups) {
+        innerHTML += `<option value="${group.group_id}"`
+        if (group.id === groupIdDisplayed) {
+            innerHTML += ' selected="selected"'
+        }
+        innerHTML += `>${group.name}</option>\n`
+    }
+    innerHTML += '<option value="-1">&mdash; new group &mdash;</option>\n'
+    groupSelect.innerHTML = innerHTML
+}
+
 function showContacts(contacts) {    
     console.log("showContacts(contacts) === === ===")
-    title.textContent = 'Contacts'
-    leftNav.textContent = ''
-    rightNav.textContent = 'Add'
 
-    rightNavAction = showNewContact
+    switchToContactsView()
 
-    content.innerHTML = ''
+    // makeGroupSelect()
+
+    contactsContent.innerHTML = ''
     for (let contact of contacts) {
         const {contact_id: contId, fname, lname} = contact
         console.log("showContacts contId:", contId, "fname:", fname, "lname:", lname)
@@ -549,7 +685,7 @@ function showContacts(contacts) {
         delBtn.id = contId
         delBtn.addEventListener('click', delContact)
         div.appendChild(delBtn)
-        content.appendChild(div)
+        contactsContent.appendChild(div)
     }
 }
 
@@ -569,15 +705,103 @@ function delContact(evt) {
     .catch(err => console.log(err))
 }
 
-function showAllContacts() {
-    console.log("showAllContacts get userId:", userId)
-    // content.innerHTML = 'Contacts'
-    axios.get(`/api/contacts?id=${userId}`)
+function getContacts() {
+    console.log("getContacts get userId:", userId)
+    // contactsContent.innerHTML = 'Contacts'
+    axios.get(`/api/contacts?id=${userId}&group=${groupIdDisplayed}`)
     .then(res => {
-        console.log("showAllContacts then res.body:", res.data)
+        console.log("getContacts then res.body:", res.data)
         showContacts(res.data)
     })
     .catch(err => console.log(err))
+}
+
+function editContacts(evt) {
+
+}
+
+//
+// === groups ===
+//
+
+function getGroups() {
+    console.log("getGroups() === === ===")
+    console.log("getGroups get userId:", userId)
+    // contactsContent.innerHTML = 'Contacts'
+    axios.get(`/api/groups?id=${userId}`)
+    .then(res => {
+        console.log("getGroups then res.body:", res.data)
+        groups = res.data
+        makeGroupSelect()
+    })
+    .catch(err => console.log(err))
+}
+
+function removeNewGroupView(evt) {
+    console.log("removeNewGroupView() === === ===")
+    document.getElementById('new_group_view').remove()
+    groupSelect.value = groupIdDisplayed
+}
+
+function cancelMakeNewGroup(evt) {
+    console.log("cancelMakeNewGroup() === === ===")
+    evt.preventDefault()
+    removeNewGroupView()
+}
+
+function makeNewGroup(evt) {
+    console.log("makeNewGroup() === === ===")
+    evt.preventDefault()
+    
+    const name = document.getElementsByName('group')[0].value.trim()
+    console.log("makeNewGroup group:", name)
+
+    removeNewGroupView()
+
+    axios.post(`/api/group/${userId}`, {name: name})
+    .then(res => {
+        console.log("makeNewGroup then res.data:", res.data)
+        groups = res.data
+        makeGroupSelect()
+    })
+    .catch(err => console.log(err))
+}
+
+function showNewGroupView() {
+    console.log("showNewGroupView() === === ===")
+    const newGroupView = document.createElement('div')
+    newGroupView.id = 'new_group_view'
+
+    let innerHTML = `<div class="new_group">\n`
+    innerHTML += `<form>\n`
+    innerHTML += `<input type="text" name="group" placeholder="group">\n`
+    innerHTML += `<div>\n`
+    innerHTML += `<button id="cancel">Cancel</button><button id="create">Create</button>\n`
+    innerHTML += `</div>\n`
+    innerHTML += `</form>\n`
+    innerHTML += `</div>\n`
+
+    newGroupView.innerHTML = innerHTML
+
+    document.querySelector('.sections').appendChild(newGroupView)
+
+    document.getElementById('cancel').addEventListener('click', cancelMakeNewGroup)
+    document.getElementById('create').addEventListener('click', makeNewGroup)
+}
+
+function handleGroupSelectChanged(evt) {
+    console.log("handleGroupSelectChanged(evt)")
+    const groupIdSelected = evt.target.value
+    console.log("handleGroupSelectChanged groupId:", groupIdSelected)
+
+    if (groupIdSelected < 0) {
+        showNewGroupView()
+        return
+    }
+
+    groupIdDisplayed = groupIdSelected
+
+    getContacts()
 }
 
 //
@@ -617,11 +841,17 @@ function getTypeArrays() {
 loginBtn.addEventListener('click', handleLoginButton)
 signUpLink.addEventListener('click', handleSignUpLink)
 
-leftNav.addEventListener('click', doLeftNavAction)
-rightNav.addEventListener('click', doRightNavAction)
+document.getElementById('contacts_left_nav').addEventListener('click', editContacts)
+document.getElementById('contacts_right_nav').addEventListener('click', showAddContact)
+document.getElementById('left')
+
+groupSelect.addEventListener('change', handleGroupSelectChanged)
+
+contactLeftNav.addEventListener('click', doContactLeftNavAction)
+contactRightNav.addEventListener('click', doContactRightNavAction)
 
 if (userId > 0 ) {
     doLogin('James')
 }
-// showAllContacts()
+// getContacts()
 // getTypeArrays()

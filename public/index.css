@@ -4,74 +4,141 @@
 }
 
 body {
-    box-sizing: border-box;
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
     background-color: #C2C2C2;
     /* background-color: #DADADA; */
-    height: 100vh;
-    padding-bottom: 52px;
+    overflow: hidden;
 }
 
-.top_header, footer {
+main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    font-size: 0.7em;
-    height: 24px;
-    width: 300px;
+    align-items: stretch;
+    background-color: #FFFFFF;
+    height: 100vh;
+    width: 700px;
     margin: 0px auto;
 }
 
-.top_header {
-    text-align: right;
+header, footer {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
 }
 
-.top_header span {
+.mainheader, footer {
+    flex-basis: 24px;
+    /* flex-basis: 48px; */
+    flex-shrink: 0;
+    font-size: 0.7em;
+    background-color: #C2C2C2;
+}
+
+.mainheader {
+    /* background-color: red; */
+    justify-content: flex-end;
+    width: 100%;
+    /* padding-right: 16px; */
+    padding-right: 2px;
+    margin: 0px auto;
+}
+
+.subheader {
+    position: relative;
+    /* position: fixed; */
+    /* position: static; */
+    /* flex-shrink: 0; */
+    /* flex-basis: 32px; */
+    justify-content: center;
+    height: 32px;
+    padding: 4px 16px;
+    border-bottom: 1px solid #000000;
+}
+
+.mainheader span {
     margin-left: 6px;
     margin-right: 6px;
 }
 
-.top_header button {
+.mainheader button {
     color: #0040DD;
     background-color: #C2C2C2;
     border: none;
-    /* margin: 0px 8px; */
+    margin: 0px;
 }
 
-main {
+.sections {
     position: relative;
-    background-color: #F3F3F3;
+    display: flex;
+    align-items: stretch;
     height: 100%;
-    width: 300px;
-    padding-right: 16px;
-    margin: 0px auto;
+    overflow: auto;
+    /* overflow: hidden; */
+    /* border: 1px solid #000000; */
+    /* border: 1px solid #393939; */
+    /* border: 1px solid #434343; */
+    /* border: 1px solid #606060; */
+    border: 1px solid #6A6A6A;
+    /* border: 1px solid #747474; */
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    /* background-color: yellow; */
+    flex-grow: 10;
+    /* flex-grow: 5; */
+    width: 350px;
+    /* overflow: auto; */
+    /* border-right: 1px solid #000000; */
+    /* border: 1px solid #000000; */
+    z-index: 1;
 }
 
 footer {
-    text-align: center;
+    /* justify-content: center; */
+    justify-content: center;
     color: #616161;
+    background-color: #C2C2C2;
+    text-align: center;
 }
 
-/* div.header_footer {
-
-} */
-
-section {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    /* padding-right: 16px; */
-}
-
-#login_view {
-    box-sizing: border-box;
-    background-color: #F3F3F3;
+.content {
     /* background-color: red; */
-    padding: 36px 16px;
-    z-index: 10;
+    /* height: 100%; */
+    flex-grow: 10;
+    /* height: 700px; */
+    /* height: 800px; */
+    height: 835px;
+    /* height: 100%; */
+    overflow: auto;
+    flex-grow: 10;
+    padding: 8px 16px;
 }
 
-#login_view h1 {
+#contact_content {
+    padding: 0px 16px;
+}
+
+nav {
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    top: 9px;
+    left: 0px;
+    width: 100%;
+}
+
+nav button {
+    color: #0040DD;
+    background-color: #FFFFFF;
+    border: none;
+    margin: 0px 16px;
+}
+
+h1 {
     /* background-color: red; */
     font-size: 2.4em;
     text-align: center;
@@ -79,43 +146,6 @@ section {
     width: 80%;
     padding: 4px 8px;
     margin: 0px auto;
-}
-
-#contacts_view {
-    /* background-color: red; */
-    box-sizing: border-box;
-    padding: 0px;
-    z-index: 1;
-}
-
-.subheader {
-    position: relative;
-    width: 100%;
-    border-bottom: 1px solid black;
-}
-
-#title {
-    text-align: center;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    top: 7px;
-    left: 0px;
-    width: 100%;
-    font-size: 0.8em;
-}
-
-nav button {
-    color: #0040DD;
-    /* background-color: none; */
-    background-color: #F3F3F3;
-    border: none;
-    margin: 0px 8px;
 }
 
 button, .hover {
@@ -139,6 +169,10 @@ input {
 }
 
 select {
+    outline: none;
+}
+
+form select {
     color: #646464;
     width: 80px;
 }
@@ -173,17 +207,6 @@ li {
     border: 1px solid #646464;
     border-radius: 4px;
     padding: 1px 4px;
-    margin-left: 16px;
-}
-
-.content {
-    box-sizing: border-box;
-    /* background-color: blue; */
-    position: absolute;
-    overflow: auto;
-    top: 30px;
-    bottom: 0px;
-    width: 300px;
     margin-left: 16px;
 }
 
@@ -252,6 +275,14 @@ div.cont_details {
     margin-top: 6px;
 }
 
+div.login_view {
+    box-sizing: border-box;
+    /* background-color: blue; */
+    width: 300px;
+    padding: 36px 16px;
+    margin: 36px auto 0px;
+}
+
 aside {
     /* background-color: red; */
     box-sizing: border-box;
@@ -299,7 +330,11 @@ form button {
     border-radius: 6px;
     padding: 4px 8px;
     /* margin-top: 8px; */
-    margin: 8px auto;
+    margin: 8px;
+}
+
+form p {
+    margin-top: 4px;
 }
 
 input[name="name"] {
@@ -308,4 +343,60 @@ input[name="name"] {
 
 input[name="passwd2"] {
     display: none;
+}
+
+#new_group_view {
+    position: absolute;
+    /* display: flex;
+    align-items: center;
+    align-content: center; */
+    box-sizing: border-box;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+    /* background-color: #000000; */
+    background-color: #565656;
+    padding-bottom: 25vh;
+    z-index: 50;
+    overflow: hidden;
+    /* opacity: 0.6; */
+}
+
+.new_group {
+    /* opacity: 1.0; */
+    box-sizing: border-box;
+    width: 300px;
+    background-color: #FFFFFF;
+    border: 1px solid #000000;
+    padding: 36px;
+    margin: 36px auto 0px;
+}
+
+#login_view {
+    width: 750px;
+}
+
+#contacts_view {
+    border-right: 1px solid #000000;
+}
+
+/* #login_view {
+    display: none;
+} */
+
+#contacts_view, #contact_view {
+    display: none;
+}
+
+@media (max-width: 750px) {
+    main, #login_view, #contacts_view, #contact_view {
+        width: 350px;
+    }
+    #contacts_view {
+        border-right: none;
+    }
+    #contact_view {
+        display: none;
+    }
 }

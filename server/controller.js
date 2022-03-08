@@ -21,8 +21,19 @@ function passHashToUse(passHash) {
     return passHash.replace(/[|]/g,'$')
 }
 
-function contactsQuery(userId) {
-    return `select contact_id, fname, lname from contacts where user_id=${userId} order by lname, fname, contact_id`
+function contactsQuery(userId, groupId) {
+
+    // create table contacts_groups (
+    //     id serial primary key,
+    //     contact_id int not null references contacts(contact_id),
+    //     group_id int not null references groups(group_id)
+    // );
+
+    if (groupId > 0) {
+        return `select contacts.contact_id, fname, lname from contacts, contacts_groups where contacts.contact_id=contacts_groups.contact_id and user_id=${userId} and group_id=${groupId} order by lname, fname, contact_id`
+    } else {
+        return `select contact_id, fname, lname from contacts where user_id=${userId} order by lname, fname, contact_id`
+    }
 }
 
 function contactQuery(contId) {
@@ -31,6 +42,10 @@ function contactQuery(contId) {
     qry += `select email_id, email, emails.type_id, type from emails, email_types where emails.type_id=email_types.id and contact_id=${contId} order by sort;`
     qry += `select address_id, addr1, addr2, city, state, zip, addresses.type_id, type from addresses, address_types where addresses.type_id=address_types.id and contact_id=${contId} order by sort;`
     return qry
+}
+
+function groupsQuery(userId) {
+    return `select group_id, name from groups where user_id=${userId} order by name, group_id`
 }
 
 module.exports = {
@@ -106,22 +121,22 @@ module.exports = {
         .then(dbRes => res.status(200).send(dbRes[0]))
         .catch(err => console.log(err))
     },
-    postContact: (req, res) => {
-        console.log("putContact req.params:", req.params)
+    addContact: (req, res) => {
+        console.log("addContact req.params:", req.params)
         const userId = req.params.id
-        console.log("postContact req.body:", req.body)
+        console.log("addContact req.body:", req.body)
 
         const {fname, lname, pTypeIds, phones, eTypeIds, emails, aTypeIds, addr1s, addr2s, cities, states, zips, note} = req.body
 
         let qry = `insert into contacts (user_id, fname, lname, note) values(${userId}, '${fname}', '${lname}', '${note}') returning contact_id`
-        console.log("postContact qry:", qry)
+        console.log("addContact qry:", qry)
 
         sequelize.query(qry)
             .then(dbRes => {
-                console.log("postContact then1 dbRes[0]:", dbRes[0])
-                console.log("postContact then1 dbRes[0][0]:", dbRes[0][0])
+                console.log("addContact then1 dbRes[0]:", dbRes[0])
+                console.log("addContact then1 dbRes[0][0]:", dbRes[0][0])
                 const contId = dbRes[0][0].contact_id
-                console.log("postContact then1 contId:", contId)
+                console.log("addContact then1 contId:", contId)
 
                 let qry = ''
 
@@ -144,7 +159,7 @@ module.exports = {
                 }
 
                 qry += contactQuery(contId)
-                console.log("postContact then1 qry:", qry)
+                console.log("addContact then1 qry:", qry)
 
                 sequelize.query(qry)
                     .then(dbRes => res.status(200).send(dbRes[0]))
@@ -152,20 +167,20 @@ module.exports = {
             })
             .catch(err => console.log(err))
     },
-    putContact: (req, res) => {
-        console.log("putContact req.params:", req.params)
+    editContact: (req, res) => {
+        console.log("editContact req.params:", req.params)
         const contId = req.params.id
-        console.log("putContact contId:", contId)
-        console.log("putContact req.body:", req.body)
+        console.log("editContact contId:", contId)
+        console.log("editContact req.body:", req.body)
 
         const {fname, lname, phoneIds, pTypeIds, phones, emailIds, eTypeIds, emails, addrIds, aTypeIds, addr1s, addr2s, cities, states, zips, note} = req.body
 
         const noteE = sequelize.escape(note)
-        console.log("putContact phoneIds:", phoneIds)
-        console.log("putContact emailIds:", emailIds)
-        console.log("putContact addrIds:", addrIds)
-        console.log("putContact  note: === === ===\n", note,"\n=== === ===")
-        console.log("putContact noteE: === === ===\n", noteE,"\n=== === ===")
+        console.log("editContact phoneIds:", phoneIds)
+        console.log("editContact emailIds:", emailIds)
+        console.log("editContact addrIds:", addrIds)
+        console.log("editContact  note: === === ===\n", note,"\n=== === ===")
+        console.log("editContact noteE: === === ===\n", noteE,"\n=== === ===")
 
         let qry = `update contacts set fname='${fname}', lname='${lname}', note='${note}' where contact_id=${contId};`
 
@@ -207,9 +222,7 @@ module.exports = {
         }
 
         qry += contactQuery(contId)
-        console.log("putContact qry:", qry)
-
-        // res.status(200)
+        console.log("editContact qry:", qry)
 
         sequelize.query(qry)
             .then(dbRes => res.status(200).send(dbRes[0]))
@@ -235,16 +248,41 @@ module.exports = {
     //
     // === contacts ===
     //
-    getAllContacts: (req, res) => {
-        const userId = req.query.id
-        console.log("getAllContacts userId:", userId)
-        const qry = contactsQuery(userId)
-        console.log("getAllContacts qry:", qry)
+    getContacts: (req, res) => {
+        const {id: userId, group: groupId} = req.query
+        console.log("getContacts userId:", userId, "groupId:", groupId)
+        const qry = contactsQuery(userId, groupId)
+        console.log("getContacts qry:", qry)
         sequelize.query(qry)
         .then(dbRes => res.status(200).send(dbRes[0]))
         .catch(err => console.log(err))
     },
     //
+    // === groups ===
+    //
+    getGroups: (req, res) => {
+        const userId = req.query.id
+        console.log("getGroups userId:", userId)
+        const qry = groupsQuery(userId)
+        console.log("getGroups qry:", qry)
+        sequelize.query(qry)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(err => console.log(err))
+    },
+    addGroup: (req, res) => {
+        console.log("addGroup")
+        const userId = req.params.id
+        console.log("addGroup req.body:", req.body)
+        const {name} = req.body
+
+        let qry = `insert into groups (user_id, name) values(${userId}, '${name}');`
+        qry += groupsQuery(userId)
+        console.log("addGroup qry:", qry)
+
+        sequelize.query(qry)
+            .then(dbRes => { res.status(200).send(dbRes[0])})
+            .catch(err => console.log(err))
+    },
     // === set up ===
     ///
     getTypeArrays: (req, res) => {
