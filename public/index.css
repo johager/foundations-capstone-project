@@ -248,6 +248,9 @@ li {
     padding-left: 90px;
 }
 
+#p_sect, #e_sect, #a_sect {
+}
+
 .type, .type_edit {
     color: #646464;
     font-size: 0.8em;
@@ -271,6 +274,7 @@ li {
 
 div.cont_details {
     display: flex;
+    align-items: baseline;
     gap: 0.6em;
     margin-top: 8px;
     margin-bottom: 8px;

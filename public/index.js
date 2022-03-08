@@ -6,13 +6,17 @@ let groups = []
 
 let contacts = []
 
-let contId = 0
+let contId = -1
 let contactInfo = []
 let contactInfoDisplayed = []
 
 const pTypes = []
 const eTypes = []
 const aTypes = []
+
+let pSelect = null  // phone-type select element
+let eSelect = null  // email-type select element
+let aSelect = null  // addr-type select element
 
 const mainheader = document.querySelector('.mainheader')
 
@@ -182,9 +186,14 @@ function doLogin(name) {
     mainheader.firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
     document.getElementById('logout').addEventListener('click', handleLogout)
 
-    getContacts()
     getGroups()
     getTypeArrays()
+
+    if (contId > 0) {
+        getContact()
+    } else {
+        getContacts()
+    }
 }
 
 function handleCreateUser(inputs) {
@@ -317,7 +326,11 @@ function showAddContact() {
     ]
 
     if (mainheader.offsetWidth > 600) {
-        contactLeftNavAction = showContactDisplayed
+        if (contId < 0 ) {
+            contactLeftNavAction = showContactDispNoContact
+        } else {
+            contactLeftNavAction = showContactDisplayed
+        }
     } else {
         contactLeftNavAction = getContacts
     }
@@ -419,14 +432,31 @@ function updateContact() {
     .catch(err => console.log(err))
 }
 
+function showContactDispNoContact() {
+    console.log("showContactDispNoContact() === === ===")
+    
+    contactTitle.textContent = ''
+    contactLeftNav.textContent = ''
+    contactRightNav.textContent = ''
+    contactContent.innerHTML = ''
+    pSelect = null
+    eSelect = null
+    aSelect = null
+}
+
 function showContactDisplayed() {
     console.log("showContactDisplayed() === === ===")
+
     contactInfo = contactInfoDisplayed
     showContactDisp()
 }
 
 function showContactDisp() {
     console.log("showContactDisp() === === ===")
+
+    pSelect = null
+    eSelect = null
+    aSelect = null
 
     switchToContactView()
 
@@ -545,8 +575,34 @@ function showContactDisp() {
     contactContent.innerHTML = innerHTML
 }
 
-function makeSelect(name, types, typeId) {
-    let innerHTML = `<select name="${name}">\n`
+function tSelId(tSelType) {
+    return `${tSelType}_sel`
+}
+
+function setTSelect(tSelType) {
+    console.log(`setTSelect(tSelType) - ${tSelType} === === ===`)
+
+    switch (tSelType) {
+        case 'p':
+            pSelect = document.getElementById(tSelId(tSelType))
+            pSelect.addEventListener('change', handlePSelectChanged)
+            break
+        case 'e':
+            eSelect = document.getElementById(tSelId(tSelType))
+            eSelect.addEventListener('change', handleESelectChanged)
+            break
+        case 'a':
+            aSelect = document.getElementById(tSelId(tSelType))
+            aSelect.addEventListener('change', handleASelectChanged)
+    }
+}
+
+function makeSelect(name, types, typeId, tSelType) {
+    let innerHTML = `<select`
+    if (typeId === 0 ) {
+        innerHTML += ` id=${tSelId(tSelType)}`
+    }
+    innerHTML += ` name="${name}">\n`
     if (typeId === 0) {
         innerHTML += '<option value="0">&ndash; type &ndash;</option>\n'
     } else {
@@ -566,7 +622,7 @@ function makeSelect(name, types, typeId) {
 function makePhoneItem(phoneId,phone,pTypeId) {
     let innerHTML = '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="phone_id" value="${phoneId}">`
-    innerHTML += `\n<div class="type_edit">${makeSelect('ptype_id', pTypes, pTypeId)}</div><input type="text" class="data" name="phone" placeholder="phone" value="${phone}">`
+    innerHTML += `\n<div class="type_edit">${makeSelect('ptype_id', pTypes, pTypeId, 'p')}</div><input type="text" class="data" name="phone" placeholder="phone" value="${phone}">`
     innerHTML += '\n</div>'
     return innerHTML
 }
@@ -574,7 +630,7 @@ function makePhoneItem(phoneId,phone,pTypeId) {
 function makeEmailItem(emailId,email,eTypeId) {
     let innerHTML = '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="email_id" value="${emailId}">`
-    innerHTML += `\n<div class="type_edit">${makeSelect('etype_id', eTypes, eTypeId)}</div><input type="email" class="data" name="email" placeholder="email" value="${email}">`
+    innerHTML += `\n<div class="type_edit">${makeSelect('etype_id', eTypes, eTypeId, 'e')}</div><input type="email" class="data" name="email" placeholder="email" value="${email}">`
     innerHTML += '\n</div>'
     return innerHTML
 }
@@ -582,7 +638,7 @@ function makeEmailItem(emailId,email,eTypeId) {
 function makeAddrItem(addrId,addr1,addr2,city,state,zip,aTypeId) {
     let innerHTML = '\n<div class="cont_details">'
     innerHTML += `\n<input type="hidden" name="addr_id" value="${addrId}">`
-    innerHTML += `\n<div class="type_edit">${makeSelect('atype_id', aTypes, aTypeId)}</div><div>`
+    innerHTML += `\n<div class="type_edit">${makeSelect('atype_id', aTypes, aTypeId, 'a')}</div><div>`
     innerHTML += `\n<input type="text" class="data" name="addr1" placeholder="street" value="${addr1}"><br>`
     innerHTML += `\n<input type="text" class="data" name="addr2" placeholder="street" value="${addr2}"><br>`
     innerHTML += `\n<input type="text" class="data" name="city" placeholder="city" value="${city}"><br>`
@@ -590,6 +646,48 @@ function makeAddrItem(addrId,addr1,addr2,city,state,zip,aTypeId) {
     innerHTML += `\n<input type="text" class="zip" name="zip" placeholder="zip" value="${zip}"></div>`
     innerHTML += '\n</div>'
     return innerHTML
+}
+
+function handlePSelectChanged(evt) {
+    console.log("handlePSelectChanged(evt) === === ===")
+
+    pSelect.removeEventListener('change', handlePSelectChanged)
+    pSelect.removeAttribute('id');
+
+    const div = document.createElement('div')
+    div.innerHTML = makePhoneItem(0,'',0)
+    
+    document.getElementById('p_sect').appendChild(div)
+
+    setTSelect('p')
+}
+
+function handleESelectChanged(evt) {
+    console.log("handleESelectChanged(evt) === === ===")
+
+    eSelect.removeEventListener('change', handleESelectChanged)
+    eSelect.removeAttribute('id');
+
+    const div = document.createElement('div')
+    div.innerHTML = makeEmailItem(0,'',0)
+    
+    document.getElementById('e_sect').appendChild(div)
+
+    setTSelect('e')
+}
+
+function handleASelectChanged(evt) {
+    console.log("handleASelectChanged(evt) === === ===")
+
+    aSelect.removeEventListener('change', handleASelectChanged)
+    aSelect.removeAttribute('id');
+
+    const div = document.createElement('div')
+    div.innerHTML = makeAddrItem(0,'','','','','',0)
+    
+    document.getElementById('a_sect').appendChild(div)
+
+    setTSelect('a')
 }
 
 function showContactAddEdit(titleText) {
@@ -617,35 +715,45 @@ function showContactAddEdit(titleText) {
     let i = 1
     console.log("look for phone, i:", i, "contactInfo.length:", contactInfo.length)
     innerHTML += '\n<div class="cont_sect_edit">Phone</div>'
+    innerHTML += `\n<div id="p_sect">`
     while (contactInfo.length > i && "phone" in contactInfo[i]) {
         const {phone_id: phoneId, phone, type_id: pTypeId} = contactInfo[1]
         innerHTML += makePhoneItem(phoneId,phone,pTypeId)
         i++
     }
     innerHTML += makePhoneItem(0,'',0)
+    innerHTML += `\n</div>`
     
     console.log("look for email, i:", i, "contactInfo.length:", contactInfo.length)
     innerHTML += '\n<div class="cont_sect_edit">Email</div>'
+    innerHTML += `\n<div id="e_sect">`
     while (contactInfo.length > i && "email" in contactInfo[i]) {
         const {email_id: emailId, email, type_id: eTypeId} = contactInfo[i]
         innerHTML += makeEmailItem(emailId,email,eTypeId)
         i++
     }
     innerHTML += makeEmailItem(0,'',0)
+    innerHTML += `\n</div>`
     
     console.log("look for addr1, i:", i, "contactInfo.length:", contactInfo.length)
     innerHTML += '\n<div class="cont_sect_edit">Address</div>'
+    innerHTML += `\n<div id="a_sect">`
     while (contactInfo.length > i && "addr1" in contactInfo[i]) {
         const {address_id: addrId, addr1, addr2, city, state, zip, type_id: aTypeId} = contactInfo[i]
         innerHTML += makeAddrItem(addrId,addr1,addr2,city,state,zip,aTypeId)
         i++
     }
     innerHTML += makeAddrItem(0,'','','','','',0)
+    innerHTML += `\n</div>`
 
     innerHTML += '\n<div class="cont_sect_edit">Note</div>'
     innerHTML += `\n<div class="textarea"><textarea rows="10" name="note" placeholder="note">${note}</textarea></div>`
 
     contactContent.innerHTML = innerHTML
+
+    setTSelect('p')
+    setTSelect('e')
+    setTSelect('a')
 }
 
 function getContact() {
@@ -727,6 +835,11 @@ function delContact(evt) {
 
 function getContacts() {
     console.log("getContacts get userId:", userId)
+
+    pSelect = null
+    eSelect = null
+    aSelect = null
+
     // contactsContent.innerHTML = 'Contacts'
     axios.get(`/api/contacts?id=${userId}&group=${groupIdDisplayed}`)
     .then(res => {
