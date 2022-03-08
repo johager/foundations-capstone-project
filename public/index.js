@@ -4,6 +4,8 @@ console.log("userId:", userId)
 let groupIdDisplayed = 0
 let groups = []
 
+let contacts = []
+
 let contId = 0
 let contactInfo = []
 let contactInfoDisplayed = []
@@ -21,6 +23,9 @@ const signUpLink = document.querySelector('form').querySelector('a')
 const loginView = document.getElementById('login_view')
 const contactsView = document.getElementById('contacts_view')
 const contactView = document.getElementById('contact_view')
+
+const contactsLeftNav = document.getElementById('contacts_left_nav')
+const contactsRightNav = document.getElementById('contacts_right_nav')
 
 const contactTitle = document.getElementById('contact_title')
 const contactLeftNav = document.getElementById('contact_left_nav')
@@ -43,8 +48,15 @@ console.log(` contactView.style.display: '${contactView.style.display}'`)
 // === nav ===
 //
 
+let contactsLeftNavAction = () => {}
+
 let contactLeftNavAction = () => {}
 let contactRightNavAction = () => {}
+
+function doContactsLeftNavAction(evt) {
+    console.log("doContactsLeftNavAction() === === ===")
+    contactsLeftNavAction()
+}
 
 function doContactLeftNavAction(evt) {
     console.log("doContactLeftNavAction() === === ===")
@@ -77,7 +89,7 @@ function contactViewIsHidden() {
 }
 
 function showLoginView() {
-    console.log("showContactsView() === === ===")
+    console.log("showLoginView() === === ===")
     loginView.style.display = 'block'
 }
 
@@ -269,8 +281,11 @@ function handleLogout(evt) {
     hideContactView()
 
     userId = -1
+    groups = []
+    contacts = []
     contId = 0
     contactInfo = []
+    contactInfoDisplayed = []
 
     mainheader.firstChild.innerHTML = ''
     contactsContent.innerHTML = ''
@@ -661,12 +676,16 @@ function makeGroupSelect() {
     groupSelect.innerHTML = innerHTML
 }
 
-function showContacts(contacts) {    
+
+function doShowContacts() {
     console.log("showContacts(contacts) === === ===")
 
     switchToContactsView()
 
-    // makeGroupSelect()
+    contactsLeftNav.textContent = 'Edit'
+    contactsRightNav.textContent = 'Add'
+
+    contactsLeftNavAction = editContacts
 
     contactsContent.innerHTML = ''
     for (let contact of contacts) {
@@ -679,14 +698,15 @@ function showContacts(contacts) {
         span.textContent = `${lname}, ${fname}`
         span.addEventListener('click', clickedOnContact)
         div.appendChild(span)
-        const delBtn = document.createElement('button')
-        delBtn.textContent = 'X'
-        delBtn.className = 'del_btn'
-        delBtn.id = contId
-        delBtn.addEventListener('click', delContact)
-        div.appendChild(delBtn)
         contactsContent.appendChild(div)
     }
+}
+
+function showContacts(contactsToDisplay) {    
+    console.log("showContacts(contacts) === === ===")
+    contacts = contactsToDisplay
+
+    doShowContacts()
 }
 
 function clickedOnContact(evt) {
@@ -716,8 +736,36 @@ function getContacts() {
     .catch(err => console.log(err))
 }
 
-function editContacts(evt) {
+function doneEditContacts(evt) {
+    console.log("doneEditContacts(evt) === === ===")
+    getContacts()
+}
 
+function editContacts(evt) {
+    console.log("editContacts(evt) === === ===")
+
+    contactsLeftNav.textContent = 'Done'
+    contactsRightNav.textContent = ''
+
+    contactsLeftNavAction = doneEditContacts
+
+    contactsContent.innerHTML = ''
+    for (let contact of contacts) {
+        const {contact_id: contId, fname, lname} = contact
+        console.log("editContacts contId:", contId, "fname:", fname, "lname:", lname)
+        const div = document.createElement('div')
+        const delBtn = document.createElement('button')
+        delBtn.textContent = 'X'
+        delBtn.className = 'del_btn'
+        delBtn.id = contId
+        delBtn.addEventListener('click', delContact)
+        div.appendChild(delBtn)
+        const span = document.createElement('span')
+        span.id = contId
+        span.textContent = `${lname}, ${fname}`
+        div.appendChild(span)
+        contactsContent.appendChild(div)
+    }
 }
 
 //
@@ -841,9 +889,8 @@ function getTypeArrays() {
 loginBtn.addEventListener('click', handleLoginButton)
 signUpLink.addEventListener('click', handleSignUpLink)
 
-document.getElementById('contacts_left_nav').addEventListener('click', editContacts)
-document.getElementById('contacts_right_nav').addEventListener('click', showAddContact)
-document.getElementById('left')
+contactsLeftNav.addEventListener('click', doContactsLeftNavAction)
+contactsRightNav.addEventListener('click', showAddContact)
 
 groupSelect.addEventListener('change', handleGroupSelectChanged)
 
