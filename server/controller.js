@@ -228,23 +228,6 @@ module.exports = {
             .then(dbRes => res.status(200).send(dbRes[0]))
             .catch(err => console.log(err))
     },
-    deleteContact: (req, res) => {
-        console.log("deleteContact req.query:", req.query)
-        const contId = req.query.cont_id
-        const userId = req.query.user_id
-        console.log("deleteContact contId:", contId, "userId:", userId)
-
-        let qry = `delete from phones where contact_id=${contId};`
-        qry += `delete from emails where contact_id=${contId};`
-        qry += `delete from addresses where contact_id=${contId};`
-        qry += `delete from contacts_groups where contact_id=${contId};`
-        qry += `delete from contacts where contact_id=${contId};`
-        qry += contactsQuery(userId)
-        console.log("deleteContact qry:", qry)
-        sequelize.query(qry)
-            .then(dbRes => res.status(200).send(dbRes[0]))
-            .catch(err => console.log(err))
-    },
     //
     // === contacts ===
     //
@@ -256,6 +239,40 @@ module.exports = {
         sequelize.query(qry)
         .then(dbRes => res.status(200).send(dbRes[0]))
         .catch(err => console.log(err))
+    },
+    deleteContacts: (req, res) => {
+        console.log("deleteContacts req.body:", req.body)
+        const {userId, contIds} = req.body
+        console.log("deleteContacts userId:", userId, "contIds:", contIds)
+
+        let qry = ''
+        for (let contId of contIds) {
+            qry += `delete from phones where contact_id=${contId};`
+            qry += `delete from emails where contact_id=${contId};`
+            qry += `delete from addresses where contact_id=${contId};`
+            qry += `delete from contacts_groups where contact_id=${contId};`
+            qry += `delete from contacts where contact_id=${contId};`
+        }
+        qry += contactsQuery(userId)
+        console.log("deleteContacts qry:", qry)
+        sequelize.query(qry)
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
+    },
+    addContactsToGroup: (req, res) => {
+        console.log("addContactsToGroup req.body:", req.body)
+        const {userId, groupId, contIds} = req.body
+        console.log("addContactsToGroup userId:", userId, "groupId:", groupId, "contIds:", contIds)
+
+        let qry = ''
+        for (let contId of contIds) {
+            qry += `insert into contacts_groups (contact_id, group_id) values (${contId}, ${groupId});`
+        }
+        console.log("addContactsToGroup qry:", qry)
+
+        sequelize.query(qry)
+            .then(dbRes => res.status(200).send(dbRes[0]))
+            .catch(err => console.log(err))
     },
     //
     // === groups ===

@@ -10,6 +10,10 @@ let contId = -1
 let contactInfo = []
 let contactInfoDisplayed = []
 
+let fNameDisp = ''
+let lNameDisp = ''
+let shouldGetContacts = false
+
 const pTypes = []
 const eTypes = []
 const aTypes = []
@@ -35,6 +39,7 @@ const contactLeftNav = document.getElementById('contact_left_nav')
 const contactRightNav = document.getElementById('contact_right_nav')
 
 const groupSelect = document.getElementById('groups')
+const groupAssignSelect = document.getElementById('group_assign')
 
 const contactsContent = document.getElementById('contacts_content')
 const contactContent = document.getElementById('contact_content')
@@ -311,6 +316,10 @@ function showContact(contactInfoIn) {
     console.log("showContact(contactInfoIn) === === ===")
     contactInfo = contactInfoIn
     showContactDisp()
+
+    if (shouldGetContacts) {
+        getContacts()
+    }
 }
 
 function showAddContact() {
@@ -411,6 +420,7 @@ function addContact() {
     axios.post(`/api/contact/${userId}`, contactObj)
     .then(res => {
         console.log("addContact then res.body:", res.data)
+        shouldGetContacts = true
         showContact(res.data)
     })
     .catch(err => console.log(err))
@@ -433,6 +443,8 @@ function updateContact() {
     contactObj.addrIds = addrIds
 
     console.log("updateContact contactObj:", contactObj)
+
+    shouldGetContacts = contactObj.fname != fNameDisp || contactObj.lname != lNameDisp
 
     axios.put(`/api/contact/${contId}`, contactObj)
     .then(res => {
@@ -705,6 +717,9 @@ function showContactAddEdit(titleText) {
 
     const {fname, lname, company, note} = contactInfo[0]
 
+    fNameDisp = fname
+    lNameDisp = lname
+
     contactTitle.textContent = titleText
     contactLeftNav.textContent = 'Cancel'
     contactRightNav.textContent = 'Save'
@@ -782,7 +797,7 @@ function getContact() {
 //
 
 function makeGroupSelect() {
-    let innerHTML = '<option value="0">&mdash; all groups &mdash;</option>\n'
+    let innerHTML = '<option value="0">&mdash; select group &mdash;</option>\n'
     for (let group of groups) {
         innerHTML += `<option value="${group.group_id}"`
         if (group.id === groupIdDisplayed) {
@@ -792,6 +807,15 @@ function makeGroupSelect() {
     }
     innerHTML += '<option value="-1">&mdash; new group &mdash;</option>\n'
     groupSelect.innerHTML = innerHTML
+}
+
+function makeGroupAssignSelect() {
+    let innerHTML = '<option value="0">&mdash; select &mdash;</option>\n'
+    for (let group of groups) {
+        innerHTML += `<option value="${group.group_id}"`
+        innerHTML += `>${group.name}</option>\n`
+    }
+    groupAssignSelect.innerHTML = innerHTML
 }
 
 function doShowContacts() {
@@ -822,7 +846,7 @@ function doShowContacts() {
 function showContacts(contactsToDisplay) {    
     console.log("showContacts(contacts) === === ===")
     contacts = contactsToDisplay
-
+    
     doShowContacts()
 }
 
@@ -832,11 +856,69 @@ function clickedOnContact(evt) {
     getContact()
 }
 
-function delContact(evt) {
-    console.log("delContact contId:", evt.target.id)
-    axios.delete(`/api/contact?cont_id=${evt.target.id}&user_id=${userId}`)
+function getContIds() {
+    const contIds = []
+
+    for (let contItem of document.getElementsByName('cont')) {
+        if (contItem.checked) {
+            contIds.push(contItem.value)
+        }
+    }
+
+    console.log("contIds:", contIds)
+    return contIds
+}
+
+function clearAssignToGroup() {
+    console.log("clearAssignToGroup() === === ===")
+
+    for (let contItem of document.getElementsByName('cont')) {
+        contItem.checked = false
+    }
+}
+
+function assignGroup(evt) {
+    console.log("assignGroup(evt) === === ===")
+    // joh
+    const groupId = groupAssignSelect.value
+    console.log("assignGroup groupId:", groupId)
+
+    if (groupId < 1) {
+        showAlert('You must select a group before you can assign contacts to it.')
+        return
+    }
+
+    const contIds = getContIds()
+
+    if (contIds.length < 1) {
+        return
+    }
+
+    axios.post(`/api/contacts`, {userId: userId, groupId: groupId, contIds: contIds})
     .then(res => {
-        console.log("delContact then res.body:", res.data)
+        console.log("assignGroup then res.body:", res.data)
+    })
+    .catch(err => console.log(err))
+
+    groupAssignSelect.value = 0
+
+    for (let contItem of document.getElementsByName('cont')) {
+        contItem.checked = false
+    }
+}
+
+function delContacts(evt) {
+    console.log("delContacts(evt) === === ===")
+
+    const contIds = getContIds()
+
+    if (contIds.length < 1) {
+        return
+    }
+
+    axios.delete(`/api/contacts`, {data: {userId: userId, contIds: contIds}})
+    .then(res => {
+        console.log("delContacts then res.body:", res.data)
         editContacts(res.data)
     })
     .catch(err => console.log(err))
@@ -859,6 +941,8 @@ function getContacts() {
 
 function doneEditContacts(evt) {
     console.log("doneEditContacts(evt) === === ===")
+    document.querySelector('.groups').style.display = 'block'
+    document.querySelector('.edit_contacts').style.display = 'none'
     doShowContacts()
 }
 
@@ -876,21 +960,19 @@ function doEditContacts() {
 
     contactsLeftNavAction = doneEditContacts
 
+    document.querySelector('.groups').style.display = 'none'
+    document.querySelector('.edit_contacts').style.display = 'block'
+    makeGroupAssignSelect()
+
     contactsContent.innerHTML = ''
     for (let contact of contacts) {
         const {contact_id: contId, fname, lname} = contact
         console.log("editContacts contId:", contId, "fname:", fname, "lname:", lname)
         const div = document.createElement('div')
-        const delBtn = document.createElement('button')
-        delBtn.textContent = 'X'
-        delBtn.className = 'del_btn'
-        delBtn.id = contId
-        delBtn.addEventListener('click', delContact)
-        div.appendChild(delBtn)
-        const span = document.createElement('span')
-        span.id = contId
-        span.textContent = `${lname}, ${fname}`
-        div.appendChild(span)
+        const label = document.createElement('label')
+        let innerHTML = `<input type="checkbox" name="cont" value="${contId}"> ${lname}, ${fname}`
+        label.innerHTML = innerHTML
+        div.appendChild(label)
         contactsContent.appendChild(div)
     }
 }
@@ -949,6 +1031,7 @@ function showNewGroupView() {
 
     let innerHTML = `<div class="new_group">\n`
     innerHTML += `<form>\n`
+    innerHTML += `<p>Make new group</p>\n`
     innerHTML += `<input type="text" name="group" placeholder="group">\n`
     innerHTML += `<div>\n`
     innerHTML += `<button id="cancel">Cancel</button><button id="create">Create</button>\n`
@@ -1020,6 +1103,9 @@ contactsLeftNav.addEventListener('click', doContactsLeftNavAction)
 contactsRightNav.addEventListener('click', showAddContact)
 
 groupSelect.addEventListener('change', handleGroupSelectChanged)
+
+document.getElementById('assign_group').addEventListener('click', assignGroup)
+document.getElementById('delete').addEventListener('click', delContacts)
 
 contactLeftNav.addEventListener('click', doContactLeftNavAction)
 contactRightNav.addEventListener('click', doContactRightNavAction)

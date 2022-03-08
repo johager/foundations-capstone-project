@@ -36,8 +36,19 @@
                 </header>
                 <header class="subheader groups">
                     <select id="groups" name="group_id">
-                        <option value="0">&mdash; all groups &mdash;</option>
+                        <option value="0">&mdash; select group &mdash;</option>
                     </select>
+                </header>
+                <header class="subheader edit_contacts">
+                    <!-- <div> </div> -->
+                    <nav>
+                        <div>
+                            <button id="assign_group">Add To Group</button>
+                            <select id="group_assign" name="group_id">
+                            </select>
+                        </div>
+                        <button id="delete">Delete</button>
+                    </nav>
                 </header>
                 <!-- <div class="content">Content</div> -->
                 <div id="contacts_content" class="content">

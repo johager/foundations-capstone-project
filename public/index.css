@@ -56,7 +56,16 @@ header, footer {
 }
 
 .groups {
+    justify-content: flex-start;
     background-color: #F6F6F6;
+}
+
+.edit_contacts {
+    position: relative;
+    display: none;
+    height: 32px;
+    margin-top: -8px;
+    margin-bottom: 8px;
 }
 
 .mainheader span {
@@ -141,6 +150,10 @@ nav button {
     background-color: #FFFFFF;
     border: none;
     margin: 0px 16px;
+}
+
+div button {
+    margin: 0px 4px 0px 16px;
 }
 
 h1 {
@@ -340,6 +353,17 @@ div.login_view input::placeholder {
     color: #B8B8B8;
 }
 
+input[type=checkbox] {
+    position: relative;
+    top: -1px;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    margin: 0px;
+    margin-right: 4px;
+    vertical-align: bottom;
+  }
+
 form div {
     font-size: 0.7em;
     text-align: center;
@@ -400,6 +424,10 @@ input[name="passwd2"] {
     border: 1px solid #000000;
     padding: 36px;
     margin: 36px auto 0px;
+}
+
+.new_group p {
+    margin-bottom: 6px;
 }
 
 #login_view {

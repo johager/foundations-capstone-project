@@ -14,7 +14,7 @@ app.get('/', (req,res) => {
 
 app.use(express.static(path.join(__dirname, '../public')))
 
-const {createUser, checkUser, getContact, addContact, editContact, deleteContact, getContacts, getGroups, addGroup, getTypeArrays} = require('./controller.js')
+const {createUser, checkUser, getContact, addContact, editContact, getContacts, deleteContacts, addContactsToGroup, getGroups, addGroup, getTypeArrays} = require('./controller.js')
 
 // login
 app.post('/api/createuser', createUser)
@@ -24,10 +24,11 @@ app.post('/api/checkuser', checkUser)
 app.get('/api/contact', getContact)
 app.post('/api/contact/:id', addContact)
 app.put('/api/contact/:id', editContact)
-app.delete('/api/contact', deleteContact)
 
 // contacts
 app.get('/api/contacts', getContacts)
+app.post('/api/contacts', addContactsToGroup)
+app.delete('/api/contacts', deleteContacts)
 
 // groups
 app.get('/api/groups', getGroups)
