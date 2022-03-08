@@ -20,7 +20,6 @@ let aSelect = null  // addr-type select element
 
 const mainheader = document.querySelector('.mainheader')
 
-const loginAside = document.querySelector('aside')
 const loginBtn = document.getElementById('login_btn')
 const signUpLink = document.querySelector('form').querySelector('a')
 
@@ -154,15 +153,9 @@ function switchToContactView() {
 // === login ===
 //
 
-function setLoginAside(innerHTML) {
-    console.log("setLoginAside(innerHTML) === === ===")
-    loginAside.style.visibility = 'visible'
-    loginAside.innerHTML = innerHTML
-}
-
-function clearLoginAside() {
-    loginAside.style.visibility = 'hidden'
-    loginAside.textContent = ''
+function showAlert(str) {
+    console.log("showAlert(str) === === ===")
+    alert(str)
 }
 
 function getLoginInputs() {
@@ -178,8 +171,6 @@ function doLogin(name) {
     if (mainheader.offsetWidth > 600) {
         showContactView()
     }
-
-    clearLoginAside()
 
     const inputs = document.querySelectorAll('input')
     for (let input of inputs) {
@@ -210,11 +201,9 @@ function handleCreateUser(inputs) {
     console.log("handleCreateUser() === === ===")
 
     if (inputs.passwd != inputs.passwd2) {
-        setLoginAside(`The passwords don't match.<br>Please try again.`)
+        showAlert(`The passwords don't match.\nPlease try again.`)
         return
     }
-
-    clearLoginAside()
 
     delete inputs.passwd2
 
@@ -223,8 +212,7 @@ function handleCreateUser(inputs) {
         console.log("handleLogin then res.data:", res.data)
         if(res.data.userId < 0) {
             console.log("handleCreateUser - exist")
-            loginAside.style.visibility = 'visible'
-            loginAside.innerHTML = `An account already exists for that email.`
+            showAlert(`An account already exists for that email.`)
         } else {
             console.log("handleCreateUser - user exists")
             userId = res.data.userId
@@ -247,7 +235,7 @@ function handleLogin(inputs) {
         console.log("handleLogin then res.data:", res.data)
         if(res.data.userId < 0) {
             console.log("handleLoginButton - user doesn't exist")
-            setLoginAside(`That login is incorrect.<br>Please try again.`)
+            showAlert(`That login is incorrect.\nPlease try again.`)
         } else {
             console.log("handleLoginButton - user exists")
             userId = res.data.userId
@@ -261,8 +249,6 @@ function handleLogin(inputs) {
 function handleLoginButton(evt) {
     console.log("handleLoginButton(evt) === === ===")
     evt.preventDefault()
-
-    clearLoginAside()
     
     const inputs = {}
     
@@ -280,7 +266,7 @@ function handleLoginButton(evt) {
 
 function handleSignUpLink(evt) {
     console.log("handleSignUpLink(evt) === === ===")
-    clearLoginAside()
+
     const inputs = getLoginInputs()
     inputs[0].style.visibility = 'visible'
     inputs[3].style.display = 'block'

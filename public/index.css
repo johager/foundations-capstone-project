@@ -308,20 +308,6 @@ p.login a:hover {
     cursor: pointer;
 }
 
-aside {
-    box-sizing: border-box;
-    /* color: #FFFFFF; */
-    color: #E9E9E9;
-    background-color: #252525;
-    font-size: 0.8em;
-    height: 56px;
-    width: 80%;
-    border: 1px solid red;
-    padding: 8px 16px;
-    margin: 32px auto;
-    visibility: hidden;
-}
-
 form {
     /* background-color: blue; */
     gap: 16px;
