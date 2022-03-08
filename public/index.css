@@ -145,6 +145,7 @@ nav button {
 
 h1 {
     /* background-color: red; */
+    color: #CCCCCC;
     font-size: 2.4em;
     text-align: center;
     font-weight: bold;
@@ -288,17 +289,31 @@ div.login_view {
     margin: 36px auto 0px;
 }
 
+p.login {
+    color: #D6D6D6;
+}
+
+p.login a:link, p.login a:visited, p.login a:active {
+    color: #D6D6D6;
+    text-decoration: none;
+}
+  
+p.login a:hover {
+    color: #E9E9E9;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 aside {
-    /* background-color: red; */
     box-sizing: border-box;
-    color: red;
+    /* color: #FFFFFF; */
+    color: #E9E9E9;
+    background-color: #252525;
     font-size: 0.8em;
-    height: 50px;
+    height: 56px;
     width: 80%;
     border: 1px solid red;
-    padding: 4px 8px;
-    /* margin-top: 32px;
-    margin-bottom: 32px; */
+    padding: 8px 16px;
     margin: 32px auto;
     visibility: hidden;
 }
@@ -323,6 +338,18 @@ form input {
     margin-bottom: 8px;
 }
 
+div.login_view input {
+    /* color: #FFFFFF; */
+    color: #E9E9E9;
+    background-color: #252525;
+    border: 1px solid #4C4C4C;
+    padding: 4px 8px;
+}
+
+div.login_view input::placeholder {
+    color: #B8B8B8;
+}
+
 form div {
     font-size: 0.7em;
     text-align: center;
@@ -334,8 +361,15 @@ form button {
     border: 1px solid #000000;
     border-radius: 6px;
     padding: 4px 8px;
-    /* margin-top: 8px; */
     margin: 8px;
+}
+
+div.login_view button {
+    /* color: #FFFFFF; */
+    color: #E9E9E9;
+    background-color: #252525;
+    border: 1px solid #4C4C4C;
+    padding: 8px 16px;
 }
 
 form p {
@@ -380,6 +414,9 @@ input[name="passwd2"] {
 
 #login_view {
     width: 750px;
+    /* background-color: #252525; */
+    background-image: url("background.png");
+    background-repeat: repeat;
 }
 
 #contacts_view {

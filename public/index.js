@@ -1,4 +1,4 @@
-let userId = 1
+let userId = -1
 console.log("userId:", userId)
 
 let groupIdDisplayed = 0
