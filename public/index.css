@@ -112,7 +112,8 @@ section {
 footer {
     /* justify-content: center; */
     justify-content: center;
-    color: #616161;
+    /* color: #616161; */
+    color: #575757;
     background-color: #C2C2C2;
     text-align: center;
 }
@@ -152,16 +153,17 @@ nav button {
     margin: 0px 16px;
 }
 
-div button {
+button.small_right {
     margin: 0px 4px 0px 16px;
 }
 
 h1 {
     /* background-color: red; */
-    color: #CCCCCC;
+    font-family: 'EB Garamond', serif;
+    color: #C2C2C2;
     font-size: 2.4em;
     text-align: center;
-    font-weight: bold;
+    font-weight: 600;
     width: 80%;
     padding: 4px 8px;
     margin: 0px auto;
@@ -258,6 +260,8 @@ li {
 }
 
 .cont_sect_edit {
+    color: #1F1F1F;
+    font-weight: 600;
     padding-left: 90px;
 }
 
@@ -307,16 +311,16 @@ div.login_view {
 }
 
 p.login {
-    color: #D6D6D6;
+    color: #CCCCCC;
 }
 
 p.login a:link, p.login a:visited, p.login a:active {
-    color: #D6D6D6;
+    color: #CCCCCC;
     text-decoration: none;
 }
   
 p.login a:hover {
-    color: #E9E9E9;
+    color: #EAEAEA;
     text-decoration: underline;
     cursor: pointer;
 }
@@ -342,10 +346,9 @@ form input {
 }
 
 div.login_view input {
-    /* color: #FFFFFF; */
     color: #E9E9E9;
     background-color: #252525;
-    border: 1px solid #4C4C4C;
+    border: 1px solid #5D5D5D;
     padding: 4px 8px;
 }
 
@@ -379,10 +382,9 @@ form button {
 }
 
 div.login_view button {
-    /* color: #FFFFFF; */
-    color: #E9E9E9;
+    color: #DBDBDB;
     background-color: #252525;
-    border: 1px solid #4C4C4C;
+    border: 1px solid #5D5D5D;
     padding: 8px 16px;
 }
 

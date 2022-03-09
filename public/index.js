@@ -7,6 +7,7 @@ let groups = []
 let contacts = []
 
 let contId = -1
+// let contId = 78
 let contactInfo = []
 let contactInfoDisplayed = []
 
@@ -191,15 +192,15 @@ function doLogin(name) {
 
     mainheader.firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
     document.getElementById('logout').addEventListener('click', handleLogout)
-
+    
     getGroups()
-    getTypeArrays()
-
+    getContacts()
+    
     if (contId > 0) {
         getContact()
-    } else {
-        getContacts()
     }
+
+    getTypeArrays()
 }
 
 function handleCreateUser(inputs) {
