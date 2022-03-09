@@ -161,6 +161,7 @@ function switchToContactView() {
 
 function showAlert(str) {
     console.log("showAlert(str) === === ===")
+    str += '\nPlease try again.'
     alert(str)
 }
 
@@ -203,11 +204,51 @@ function doLogin(name) {
     getTypeArrays()
 }
 
+function testLoginInputs(inputs,error) {
+    if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(inputs.email)) {
+        if (error.length > 0) {
+            error += '\n'
+        }
+        error += 'The email address is invalid.'
+    }
+
+    if (inputs.passwd.length < 6) {
+        if (error.length > 0) {
+            error += '\n'
+        }
+        error += 'The password must have at least six (6) characters.'
+    }
+
+    if (!/[0-9]+/.test(inputs.passwd) ) {
+        if (error.length > 0) {
+            error += '\n'
+        }
+        error +='The password must contain at least one (1) number.'
+    }
+
+    return error
+}
+
 function handleCreateUser(inputs) {
     console.log("handleCreateUser() === === ===")
 
+    let error = ''
+
+    if (inputs.name.length < 4) {
+        error += 'The name must have at least four (4) characters.'
+    }
+    
+    error = testLoginInputs(inputs,error)
+
     if (inputs.passwd != inputs.passwd2) {
-        showAlert(`The passwords don't match.\nPlease try again.`)
+        if (error.length > 0) {
+            error += '\n'
+        }
+        error += `The passwords don't match.`
+    }
+
+    if (error.length > 0) {
+        showAlert(error)
         return
     }
 
@@ -216,7 +257,7 @@ function handleCreateUser(inputs) {
     axios.post(`/api/createuser`, inputs)
     .then(res => {
         console.log("handleLogin then res.data:", res.data)
-        if(res.data.userId < 0) {
+        if (res.data.userId < 0) {
             console.log("handleCreateUser - exist")
             showAlert(`An account already exists for that email.`)
         } else {
@@ -235,13 +276,20 @@ function handleLogin(inputs) {
     delete inputs.name
     delete inputs.passwd2
     console.log("handleLoginButton inputs:", inputs)
+
+    let error = testLoginInputs(inputs,'')
+
+    if (error.length > 0) {
+        showAlert(error)
+        return
+    }
     
     axios.post(`/api/checkuser`, inputs)
     .then(res => {
         console.log("handleLogin then res.data:", res.data)
-        if(res.data.userId < 0) {
+        if (res.data.userId < 0) {
             console.log("handleLoginButton - user doesn't exist")
-            showAlert(`That login is incorrect.\nPlease try again.`)
+            showAlert(`That login is incorrect.`)
         } else {
             console.log("handleLoginButton - user exists")
             userId = res.data.userId
@@ -411,12 +459,28 @@ function contactObjForAdd() {
     return contactObj
 }
 
+function namesAreOK(contactObj) {
+
+    const {fname, lname} = contactObj
+
+    if (fname.length < 3 && lname.length < 3) {
+        showAlert(`Either the first or last name must have more than three (3) characters.`)
+        return false
+    }
+
+    return true
+}
+
 function addContact() {
     console.log("addContact() === === ===")
 
     const contactObj = contactObjForAdd()
 
     console.log("addContact contactObj:", contactObj)
+
+    if (!namesAreOK(contactObj)) {
+        return
+    }
 
     axios.post(`/api/contact/${userId}`, contactObj)
     .then(res => {
@@ -431,6 +495,10 @@ function updateContact() {
     console.log("updateContact() === === ===")
 
     const contactObj = contactObjForAdd()
+
+    if (!namesAreOK(contactObj)) {
+        return
+    }
 
     const phoneIds = []
     document.getElementsByName('phone_id').forEach(ele => phoneIds.push(+ele.value))
@@ -837,7 +905,14 @@ function doShowContacts() {
         const span = document.createElement('span')
         span.id = contId
         span.classList = "hover"
-        span.textContent = `${lname}, ${fname}`
+        let textContent = lname
+        if (fname.length > 0) {
+            if (textContent.length > 0) {
+                textContent += ', '
+            }
+            textContent += fname
+        }
+        span.textContent = textContent
         span.addEventListener('click', clickedOnContact)
         div.appendChild(span)
         contactsContent.appendChild(div)
@@ -971,7 +1046,14 @@ function doEditContacts() {
         console.log("editContacts contId:", contId, "fname:", fname, "lname:", lname)
         const div = document.createElement('div')
         const label = document.createElement('label')
-        let innerHTML = `<input type="checkbox" name="cont" value="${contId}"> ${lname}, ${fname}`
+        let name = lname
+        if (fname.length > 0) {
+            if (name.length > 0) {
+                name += ', '
+            }
+            name += fname
+        }
+        let innerHTML = `<input type="checkbox" name="cont" value="${contId}"> ${name}`
         label.innerHTML = innerHTML
         div.appendChild(label)
         contactsContent.appendChild(div)
@@ -1013,6 +1095,11 @@ function makeNewGroup(evt) {
     
     const name = document.getElementsByName('group')[0].value.trim()
     console.log("makeNewGroup group:", name)
+
+    if (name.length < 1) {
+        showAlert(`The group name must have more than one (1) character.`)
+        return false
+    }
 
     removeNewGroupView()
 
