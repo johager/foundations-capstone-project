@@ -21,13 +21,15 @@ function passHashToUse(passHash) {
     return passHash.replace(/[|]/g,'$')
 }
 
-function contactsQuery(userId, groupId) {
+function setGroupQuery(userId, groupId) {
+    return `update users set group_id=${groupId} where user_id=${userId};`
+}
 
-    // create table contacts_groups (
-    //     id serial primary key,
-    //     contact_id int not null references contacts(contact_id),
-    //     group_id int not null references groups(group_id)
-    // );
+function setContactQuery(userId, contId) {
+    return `update users set contact_id=${contId} where user_id=${userId};`
+}
+
+function contactsQuery(userId, groupId) {
 
     if (groupId > 0) {
         return `select contacts.contact_id, fname, lname from contacts, contacts_groups where contacts.contact_id=contacts_groups.contact_id and user_id=${userId} and group_id=${groupId} order by lname, fname, contact_id`
@@ -89,19 +91,19 @@ module.exports = {
         const {email, passwd} = req.body
         console.log("checkUser  email:", email)
         console.log("checkUser passwd:", passwd)
-        let qry = `select user_id, name, passwd from users where email='${email}';`
+        let qry = `select user_id, name, passwd, group_id, contact_id from users where email='${email}';`
         console.log("checkUser qry:", qry)
         sequelize.query(qry)
         .then(dbRes => {
             console.log("checkUser then dbRes[0]:", dbRes[0])
             if (dbRes[0].length > 0) {  // email exists
-                const {user_id, name, passwd: passHash} = dbRes[0][0]
+                const {user_id, name, passwd: passHash, group_id, contact_id} = dbRes[0][0]
                 console.log("checkUser  user_id:", user_id)
                 console.log("checkUser     name:", name)
                 console.log("checkUser passHash:", passHash)
                 if (bcrypt.compareSync(passwd, passHashToUse(passHash))) {  // passwd matches
                     console.log("checkUser  email:", email)
-                    res.status(200).send({userId: user_id, name: name})
+                    res.status(200).send({userId: user_id, name: name, groupId: group_id, contId: contact_id})
                     return
                 }
             }
@@ -113,9 +115,10 @@ module.exports = {
     // === contact ===
     //
     getContact: (req, res) => {
-        const contId = req.query.id
-        console.log("getContact contId:", contId)
-        const qry = contactQuery(contId)
+        const {uid: userId, cid: contId} = req.query
+        console.log("getContact userId:", userId, "contId:", contId)
+        let qry = setContactQuery(userId, contId)
+        qry += contactQuery(contId)
         console.log("getContact qry:", qry)
         sequelize.query(qry)
         .then(dbRes => res.status(200).send(dbRes[0]))
@@ -138,7 +141,7 @@ module.exports = {
                 const contId = dbRes[0][0].contact_id
                 console.log("addContact then1 contId:", contId)
 
-                let qry = ''
+                let qry = setContactQuery(userId, contId)
 
                 for(let i in phones) {
                     if (pTypeIds[i] > 0 && phones[i].length > 0) {
@@ -232,9 +235,10 @@ module.exports = {
     // === contacts ===
     //
     getContacts: (req, res) => {
-        const {id: userId, group: groupId} = req.query
+        const {uid: userId, gid: groupId} = req.query
         console.log("getContacts userId:", userId, "groupId:", groupId)
-        const qry = contactsQuery(userId, groupId)
+        let qry = setGroupQuery(userId, groupId)
+        qry += contactsQuery(userId, groupId)
         console.log("getContacts qry:", qry)
         sequelize.query(qry)
         .then(dbRes => res.status(200).send(dbRes[0]))

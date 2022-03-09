@@ -45,13 +45,13 @@ const groupAssignSelect = document.getElementById('group_assign')
 const contactsContent = document.getElementById('contacts_content')
 const contactContent = document.getElementById('contact_content')
 
-console.log("   loginView.style:", loginView.style)
-console.log("contactsView.style:", contactsView.style)
-console.log(" contactView.style:", contactView.style)
+// console.log("   loginView.style:", loginView.style)
+// console.log("contactsView.style:", contactsView.style)
+// console.log(" contactView.style:", contactView.style)
 
-console.log(`   loginView.style.display: '${loginView.style.display}'`)
-console.log(`contactsView.style.display: '${contactsView.style.display}'`)
-console.log(` contactView.style.display: '${contactView.style.display}'`)
+// console.log(`   loginView.style.display: '${loginView.style.display}'`)
+// console.log(`contactsView.style.display: '${contactsView.style.display}'`)
+// console.log(` contactView.style.display: '${contactView.style.display}'`)
 
 //
 // === misc ===
@@ -193,7 +193,7 @@ function doLogin(name) {
 
     mainheader.firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
     document.getElementById('logout').addEventListener('click', handleLogout)
-    
+
     getGroups()
     getContacts()
     
@@ -256,7 +256,7 @@ function handleCreateUser(inputs) {
 
     axios.post(`/api/createuser`, inputs)
     .then(res => {
-        console.log("handleLogin then res.data:", res.data)
+        console.log("handleCreateUser then res.data:", res.data)
         if (res.data.userId < 0) {
             console.log("handleCreateUser - exist")
             showAlert(`An account already exists for that email.`)
@@ -293,7 +293,12 @@ function handleLogin(inputs) {
         } else {
             console.log("handleLoginButton - user exists")
             userId = res.data.userId
-            console.log("handleLoginButton userId:", userId)
+            groupIdDisplayed = res.data.groupId
+            contId = res.data.contId
+            console.log("handleLoginButton ......... userId:", userId)
+            console.log("handleLoginButton groupIdDisplayed:", groupIdDisplayed)
+            console.log("handleLoginButton ......... contId:", contId)
+            groupSelect.value = groupIdDisplayed
             doLogin(res.data.name)
         }
     })
@@ -853,7 +858,7 @@ function showContactAddEdit(titleText) {
 function getContact() {
     console.log("showContact(contId) === === ===")
     console.log("showContact contId:", contId)
-    axios.get(`/api/contact?id=${contId}`)
+    axios.get(`/api/contact?uid=${userId}&cid=${contId}`)
     .then(res => {
         console.log("showContact then res.data:", res.data)
         showContact(res.data)
@@ -866,10 +871,12 @@ function getContact() {
 //
 
 function makeGroupSelect() {
+    // console.log("makeGroupSelect groupIdDisplayed:", groupIdDisplayed)
+
     let innerHTML = '<option value="0">&mdash; select group &mdash;</option>\n'
     for (let group of groups) {
         innerHTML += `<option value="${group.group_id}"`
-        if (group.id === groupIdDisplayed) {
+        if (group.group_id === groupIdDisplayed) {
             innerHTML += ' selected="selected"'
         }
         innerHTML += `>${group.name}</option>\n`
@@ -888,7 +895,7 @@ function makeGroupAssignSelect() {
 }
 
 function doShowContacts() {
-    console.log("showContacts(contacts) === === ===")
+    console.log("doShowContacts() === === ===")
 
     switchToContactsView()
 
@@ -900,7 +907,7 @@ function doShowContacts() {
     contactsContent.innerHTML = ''
     for (let contact of contacts) {
         const {contact_id: contId, fname, lname} = contact
-        console.log("showContacts contId:", contId, "fname:", fname, "lname:", lname)
+        // console.log("doShowContacts contId:", contId, "fname:", fname, "lname:", lname)
         const div = document.createElement('div')
         const span = document.createElement('span')
         span.id = contId
@@ -920,7 +927,7 @@ function doShowContacts() {
 }
 
 function showContacts(contactsToDisplay) {    
-    console.log("showContacts(contacts) === === ===")
+    console.log("showContacts(contactsToDisplay) === === ===")
     contacts = contactsToDisplay
     
     doShowContacts()
@@ -955,7 +962,6 @@ function clearAssignToGroup() {
 
 function assignGroup(evt) {
     console.log("assignGroup(evt) === === ===")
-    // joh
     const groupId = groupAssignSelect.value
     console.log("assignGroup groupId:", groupId)
 
@@ -1001,13 +1007,12 @@ function delContacts(evt) {
 }
 
 function getContacts() {
-    console.log("getContacts get userId:", userId)
+    console.log("getContacts get userId:", userId, "groupIdDisplayed:", groupIdDisplayed)
 
     setDefaultContactsNav()
     clearTSelects()
 
-    // contactsContent.innerHTML = 'Contacts'
-    axios.get(`/api/contacts?id=${userId}&group=${groupIdDisplayed}`)
+    axios.get(`/api/contacts?uid=${userId}&gid=${groupIdDisplayed}`)
     .then(res => {
         console.log("getContacts then res.body:", res.data)
         showContacts(res.data)
@@ -1043,7 +1048,7 @@ function doEditContacts() {
     contactsContent.innerHTML = ''
     for (let contact of contacts) {
         const {contact_id: contId, fname, lname} = contact
-        console.log("editContacts contId:", contId, "fname:", fname, "lname:", lname)
+        // console.log("editContacts contId:", contId, "fname:", fname, "lname:", lname)
         const div = document.createElement('div')
         const label = document.createElement('label')
         let name = lname
@@ -1198,7 +1203,7 @@ document.getElementById('delete').addEventListener('click', delContacts)
 contactLeftNav.addEventListener('click', doContactLeftNavAction)
 contactRightNav.addEventListener('click', doContactRightNavAction)
 
-if (userId > 0 ) {
+if (userId > 0) {
     doLogin('James')
 }
 // getContacts()
