@@ -7,14 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@600&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css" type='text/css' >
+    <link rel="stylesheet" href="index.css" type="text/css">
 </head>
 <body>
-    <main>
+    <div class="center">
         <header class="mainheader"><div></div></header>
-        <div class="sections">
+        <main>
             <section id="login_view">
-                <div class="login_view">
+                <div class="section_content login_view">
                     <h1>CONTACTS</h1>
                     <form>
                         <input type="text" name="name" placeholder="name">
@@ -29,59 +29,66 @@
                 </div>
             </section>
             <section id="contacts_view">
-                <header class="subheader">
-                    <div>Contacts</div>
-                    <nav>
-                        <button id="contacts_left_nav">Edit</button>
-                        <button id="contacts_right_nav">Add</button>
-                    </nav>
-                </header>
-                <header class="subheader groups">
-                    <select id="groups" name="group_id">
-                        <option value="0">&mdash; select group &mdash;</option>
-                    </select>
-                </header>
-                <header class="subheader edit_contacts">
-                    <!-- <div> </div> -->
-                    <nav>
-                        <div>
-                            <button id="assign_group" class="small_right">Add To Group</button>
-                            <select id="group_assign" name="group_id">
+                <div class="section_content">
+                    <header class="subheader">
+                        <nav>
+                            <button id="contacts_left_nav">Edit</button>
+                            <button id="contacts_right_nav">Add</button>
+                        </nav>
+                        <!-- <div class="title">Contacts</div> -->
+                    </header>
+                    <header class="subheader groups">
+                        <nav>
+                            <select id="groups" class="group_select" name="group_id">
+                                <option value="0">&mdash; select group &mdash;</option>
                             </select>
+                        </nav>
+                    </header>
+                    <header class="subheader edit_contacts">
+                        <nav>
+                            <div class="group_select">
+                                <button id="assign_group" class="small_right">Add To Group</button>
+                                <select id="group_assign" name="group_id">
+                                </select>
+                            </div>
+                            <button id="delete">Delete</button>
+                        </nav>
+                    </header>
+                    <div class="content_holder">
+                        <div id="contacts_content" class="content">
+                            <!-- <p>Contacts</p> -->
+                            <!-- <p>Bacon ipsum dolor amet swine rump ham capicola jowl shoulder ribeye chicken short ribs pork loin brisket boudin shank beef ribs tri-tip. Venison filet mignon pastrami, flank bacon meatloaf swine kevin shank sausage pork chuck pork belly. Cupim pork loin jowl drumstick flank t-bone. Shank rump porchetta, beef beef ribs boudin meatloaf. Cow meatloaf shoulder, chuck pork chop turkey alcatra tongue drumstick tail doner salami t-bone. Andouille turducken biltong pork chop.</p>
+                            <p>Doner beef ribs drumstick pancetta pork loin shank leberkas cow pork belly shoulder capicola ball tip andouille cupim. Andouille corned beef pastrami ribeye kevin. Pork belly porchetta capicola, jerky andouille strip steak bacon jowl pork drumstick beef ground round alcatra meatball salami. Meatball beef ribs strip steak pork. Chicken alcatra beef ribeye kevin tenderloin t-bone ham hock ground round.</p>
+                            <p>Sirloin landjaeger salami kielbasa leberkas shankle brisket capicola doner ball tip short ribs jerky spare ribs shank. Meatball strip steak flank pancetta, ham hock shoulder bacon t-bone. Salami meatloaf shankle biltong short loin ham hock. Rump sirloin picanha andouille prosciutto salami bresaola alcatra pork belly meatloaf pastrami venison biltong capicola. Porchetta ham hock pork loin sausage, turkey tenderloin landjaeger ribeye salami sirloin shank. Chislic spare ribs chicken fatback. Doner shank porchetta frankfurter flank, beef ribs pig.</p>
+                            <p>Pork belly porchetta brisket cupim pork loin tongue picanha spare ribs turducken meatball ham shank. Capicola meatloaf chuck pork chop. Picanha tenderloin corned beef short ribs jowl pastrami. Frankfurter biltong porchetta, kielbasa kevin capicola chislic turducken pastrami fatback ground round. Venison shoulder brisket chuck salami pastrami.</p>
+                            <p>Bacon short ribs shank kielbasa picanha turkey tri-tip pancetta. Doner porchetta sausage pork, spare ribs tongue biltong corned beef pork chop. Pancetta meatloaf short loin pork. Andouille sausage turducken buffalo, tail pork belly spare ribs pork loin short ribs jowl.</p> -->
                         </div>
-                        <button id="delete">Delete</button>
-                    </nav>
-                </header>
-                <!-- <div class="content">Content</div> -->
-                <div id="contacts_content" class="content">
-                    <!-- <p>Contacts</p> -->
-                    <!-- <p>Bacon ipsum dolor amet swine rump ham capicola jowl shoulder ribeye chicken short ribs pork loin brisket boudin shank beef ribs tri-tip. Venison filet mignon pastrami, flank bacon meatloaf swine kevin shank sausage pork chuck pork belly. Cupim pork loin jowl drumstick flank t-bone. Shank rump porchetta, beef beef ribs boudin meatloaf. Cow meatloaf shoulder, chuck pork chop turkey alcatra tongue drumstick tail doner salami t-bone. Andouille turducken biltong pork chop.</p>
-                    <p>Doner beef ribs drumstick pancetta pork loin shank leberkas cow pork belly shoulder capicola ball tip andouille cupim. Andouille corned beef pastrami ribeye kevin. Pork belly porchetta capicola, jerky andouille strip steak bacon jowl pork drumstick beef ground round alcatra meatball salami. Meatball beef ribs strip steak pork. Chicken alcatra beef ribeye kevin tenderloin t-bone ham hock ground round.</p>
-                    <p>Sirloin landjaeger salami kielbasa leberkas shankle brisket capicola doner ball tip short ribs jerky spare ribs shank. Meatball strip steak flank pancetta, ham hock shoulder bacon t-bone. Salami meatloaf shankle biltong short loin ham hock. Rump sirloin picanha andouille prosciutto salami bresaola alcatra pork belly meatloaf pastrami venison biltong capicola. Porchetta ham hock pork loin sausage, turkey tenderloin landjaeger ribeye salami sirloin shank. Chislic spare ribs chicken fatback. Doner shank porchetta frankfurter flank, beef ribs pig.</p>
-                    <p>Pork belly porchetta brisket cupim pork loin tongue picanha spare ribs turducken meatball ham shank. Capicola meatloaf chuck pork chop. Picanha tenderloin corned beef short ribs jowl pastrami. Frankfurter biltong porchetta, kielbasa kevin capicola chislic turducken pastrami fatback ground round. Venison shoulder brisket chuck salami pastrami.</p>
-                    <p>Bacon short ribs shank kielbasa picanha turkey tri-tip pancetta. Doner porchetta sausage pork, spare ribs tongue biltong corned beef pork chop. Pancetta meatloaf short loin pork. Andouille sausage turducken buffalo, tail pork belly spare ribs pork loin short ribs jowl.</p> -->
+                    </div>
                 </div>
             </section>
             <section id="contact_view">
-                <header class="subheader">
-                    <div id="contact_title"></div>
-                    <nav>
-                        <button id="contact_left_nav"></button>
-                        <button id="contact_right_nav"></button>
-                    </nav>
-                </header>
-                <div id="contact_content" class="content">
-                    <!-- <p>Contact</p> -->
-                    <!-- <p>Bacon ipsum dolor amet swine rump ham capicola jowl shoulder ribeye chicken short ribs pork loin brisket boudin shank beef ribs tri-tip. Venison filet mignon pastrami, flank bacon meatloaf swine kevin shank sausage pork chuck pork belly. Cupim pork loin jowl drumstick flank t-bone. Shank rump porchetta, beef beef ribs boudin meatloaf. Cow meatloaf shoulder, chuck pork chop turkey alcatra tongue drumstick tail doner salami t-bone. Andouille turducken biltong pork chop.</p>
-                    <p>Doner beef ribs drumstick pancetta pork loin shank leberkas cow pork belly shoulder capicola ball tip andouille cupim. Andouille corned beef pastrami ribeye kevin. Pork belly porchetta capicola, jerky andouille strip steak bacon jowl pork drumstick beef ground round alcatra meatball salami. Meatball beef ribs strip steak pork. Chicken alcatra beef ribeye kevin tenderloin t-bone ham hock ground round.</p> -->
-                    <!-- <p>Sirloin landjaeger salami kielbasa leberkas shankle brisket capicola doner ball tip short ribs jerky spare ribs shank. Meatball strip steak flank pancetta, ham hock shoulder bacon t-bone. Salami meatloaf shankle biltong short loin ham hock. Rump sirloin picanha andouille prosciutto salami bresaola alcatra pork belly meatloaf pastrami venison biltong capicola. Porchetta ham hock pork loin sausage, turkey tenderloin landjaeger ribeye salami sirloin shank. Chislic spare ribs chicken fatback. Doner shank porchetta frankfurter flank, beef ribs pig.</p> -->
-                    <!-- <p>Pork belly porchetta brisket cupim pork loin tongue picanha spare ribs turducken meatball ham shank. Capicola meatloaf chuck pork chop. Picanha tenderloin corned beef short ribs jowl pastrami. Frankfurter biltong porchetta, kielbasa kevin capicola chislic turducken pastrami fatback ground round. Venison shoulder brisket chuck salami pastrami.</p> -->
-                    <!-- <p>Bacon short ribs shank kielbasa picanha turkey tri-tip pancetta. Doner porchetta sausage pork, spare ribs tongue biltong corned beef pork chop. Pancetta meatloaf short loin pork. Andouille sausage turducken buffalo, tail pork belly spare ribs pork loin short ribs jowl.</p> -->
+                <div class="section_content">
+                    <header class="subheader">
+                        <nav>
+                            <button id="contact_left_nav"></button>
+                            <button id="contact_right_nav"></button>
+                        </nav>
+                    </header>
+                    <div class="content_holder">
+                        <div id="contact_content" class="content">
+                            <!-- <p>Contact</p> -->
+                            <!-- <p>Bacon ipsum dolor amet swine rump ham capicola jowl shoulder ribeye chicken short ribs pork loin brisket boudin shank beef ribs tri-tip. Venison filet mignon pastrami, flank bacon meatloaf swine kevin shank sausage pork chuck pork belly. Cupim pork loin jowl drumstick flank t-bone. Shank rump porchetta, beef beef ribs boudin meatloaf. Cow meatloaf shoulder, chuck pork chop turkey alcatra tongue drumstick tail doner salami t-bone. Andouille turducken biltong pork chop.</p>
+                            <p>Doner beef ribs drumstick pancetta pork loin shank leberkas cow pork belly shoulder capicola ball tip andouille cupim. Andouille corned beef pastrami ribeye kevin. Pork belly porchetta capicola, jerky andouille strip steak bacon jowl pork drumstick beef ground round alcatra meatball salami. Meatball beef ribs strip steak pork. Chicken alcatra beef ribeye kevin tenderloin t-bone ham hock ground round.</p> -->
+                            <!-- <p>Sirloin landjaeger salami kielbasa leberkas shankle brisket capicola doner ball tip short ribs jerky spare ribs shank. Meatball strip steak flank pancetta, ham hock shoulder bacon t-bone. Salami meatloaf shankle biltong short loin ham hock. Rump sirloin picanha andouille prosciutto salami bresaola alcatra pork belly meatloaf pastrami venison biltong capicola. Porchetta ham hock pork loin sausage, turkey tenderloin landjaeger ribeye salami sirloin shank. Chislic spare ribs chicken fatback. Doner shank porchetta frankfurter flank, beef ribs pig.</p> -->
+                            <!-- <p>Pork belly porchetta brisket cupim pork loin tongue picanha spare ribs turducken meatball ham shank. Capicola meatloaf chuck pork chop. Picanha tenderloin corned beef short ribs jowl pastrami. Frankfurter biltong porchetta, kielbasa kevin capicola chislic turducken pastrami fatback ground round. Venison shoulder brisket chuck salami pastrami.</p> -->
+                            <!-- <p>Bacon short ribs shank kielbasa picanha turkey tri-tip pancetta. Doner porchetta sausage pork, spare ribs tongue biltong corned beef pork chop. Pancetta meatloaf short loin pork. Andouille sausage turducken buffalo, tail pork belly spare ribs pork loin short ribs jowl.</p> -->
+                        </div>
+                    </div>
                 </div>
             </section>
-        </div>
+        </main>
         <footer><div>&copy; 2022 James Hager</div></footer>
-    </main>
+    </div>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="index.js"></script>
 </body>

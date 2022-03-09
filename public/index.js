@@ -35,7 +35,6 @@ const contactView = document.getElementById('contact_view')
 const contactsLeftNav = document.getElementById('contacts_left_nav')
 const contactsRightNav = document.getElementById('contacts_right_nav')
 
-const contactTitle = document.getElementById('contact_title')
 const contactLeftNav = document.getElementById('contact_left_nav')
 const contactRightNav = document.getElementById('contact_right_nav')
 
@@ -355,7 +354,6 @@ function handleLogout(evt) {
     contactsContent.innerHTML = ''
     contactContent.innerHTML = ''
 
-    contactTitle.textContent = ''
     contactLeftNav.textContent = ''
     contactRightNav.textContent = ''
 
@@ -532,7 +530,6 @@ function showContactDispNoContact() {
     console.log("showContactDispNoContact() === === ===")
 
     setDefaultContactsNav()
-    contactTitle.textContent = ''
     contactLeftNav.textContent = ''
     contactRightNav.textContent = ''
     contactContent.innerHTML = ''
@@ -557,8 +554,6 @@ function showContactDisp() {
     const {fname, lname, company} = contactInfo[0]
     const note = contactInfo[0].note.replace(/(?:\r\n|\r|\n)/g, '<br>')
 
-    contactTitle.textContent = `${fname} ${lname}`
-
     if (mainheader.offsetWidth > 600) {
         contactLeftNav.textContent = ''
     } else {
@@ -571,6 +566,13 @@ function showContactDisp() {
     contactRightNavAction = showEditContact
 
     let innerHTML = ''
+
+    innerHTML += `<div class="contact_name">${fname}`
+    if (fname.length > 0 && lname.length > 0) {
+        innerHTML += ' '
+    }
+    innerHTML += `${lname}</div>`
+
     if (company.length > 0) {
         innerHTML += `\n<div>${company}</div>`
     }
@@ -794,7 +796,6 @@ function showContactAddEdit(titleText) {
     fNameDisp = fname
     lNameDisp = lname
 
-    contactTitle.textContent = titleText
     contactLeftNav.textContent = 'Cancel'
     contactRightNav.textContent = 'Save'
 
@@ -1134,7 +1135,7 @@ function showNewGroupView() {
 
     newGroupView.innerHTML = innerHTML
 
-    document.querySelector('.sections').appendChild(newGroupView)
+    document.querySelector('main').appendChild(newGroupView)
 
     document.getElementById('cancel').addEventListener('click', cancelMakeNewGroup)
     document.getElementById('create').addEventListener('click', makeNewGroup)
