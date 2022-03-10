@@ -1059,7 +1059,7 @@ function delContacts(evt) {
         return
     }
 
-    axios.delete(`/api/contacts`, {data: {userId: userId, contIds: contIds}})
+    axios.delete(`/api/contacts`, {data: {userId: userId, groupId: groupIdDisplayed, contIds: contIds}})
     .then(res => {
         console.log("delContacts then res.body:", res.data)
         editContacts(res.data)

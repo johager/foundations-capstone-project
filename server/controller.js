@@ -143,21 +143,27 @@ module.exports = {
 
                 let qry = setContactQuery(userId, contId)
 
+                let sort = 1
                 for(let i in phones) {
                     if (pTypeIds[i] > 0 && phones[i].length > 0) {
-                        qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', 1);`
+                        qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', ${sort});`
+                        sort++
                     }
                 }
 
+                sort = 1
                 for(let i in emails) {
                     if (eTypeIds[i] > 0 && emails[i].length > 0) {
-                        qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', 1);`
+                        qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', ${sort});`
+                        sort++
                     }
                 }
 
+                sort = 1
                 for(let i in addr1s) {
                     if (aTypeIds[i] > 0 && (addr1s[i].length > 0 || addr2s[i].length > 0 || states[i].length > 0 || cities[i].length > 0 || zips[i].length > 0)) {
-                        qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', 1);`
+                        qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', ${sort});`
+                        sort++
                     }
                 }
 
@@ -187,40 +193,49 @@ module.exports = {
 
         let qry = `update contacts set fname='${fname}', lname='${lname}', note='${note}' where contact_id=${contId};`
 
+        let sort = 1
         for(let i in phones) {
             if (phoneIds[i] > 0) {
                 if (pTypeIds[i] > 0 && phones[i].length > 0) {
-                    qry += `update phones set type_id=${pTypeIds[i]}, phone='${phones[i]}' where phone_id=${phoneIds[i]};`
+                    qry += `update phones set type_id=${pTypeIds[i]}, phone='${phones[i]}', sort=${sort} where phone_id=${phoneIds[i]};`
+                    sort++
                 } else {
                     qry += `delete from phones where phone_id=${phoneIds[i]};`
                 }
             } else if (phones[i].length > 0) {
-                qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', ${i + 1});`
+                qry += `insert into phones (contact_id, type_id, phone, sort) values(${contId}, ${pTypeIds[i]}, '${phones[i]}', ${sort});`
+                sort++
             }
         }
 
+        sort = 1
         for(let i in emails) {
             console.log(`putContact emails[${i}], emailIds[i]:`, emailIds[i], "eTypeIds[i]:", eTypeIds[i], "emails[i]:", emails[i])
             if (emailIds[i] > 0) {
                 if (eTypeIds[i] > 0 && emails[i].length > 0) {
-                    qry += `update emails set type_id=${eTypeIds[i]}, email='${emails[i]}' where email_id=${emailIds[i]};`
+                    qry += `update emails set type_id=${eTypeIds[i]}, email='${emails[i]}', sort=${sort} where email_id=${emailIds[i]};`
+                    sort++
                 } else {
                     qry += `delete from emails where email_id=${emailIds[i]};`
                 }
             } else if (emails[i].length > 0) {
-                qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', ${i + 1});`
+                qry += `insert into emails (contact_id, type_id, email, sort) values(${contId}, ${eTypeIds[i]}, '${emails[i]}', ${sort});`
+                sort++
             }
         }
 
+        sort = 1
         for(let i in addr1s) {
             if (addrIds[i] > 0) {
                 if (aTypeIds[i] > 0 && (addr1s[i].length > 0 || addr2s[i].length > 0 || states[i].length > 0 || cities[i].length > 0 || zips[i].length > 0)) {
-                    qry += `update addresses set type_id=${aTypeIds[i]}, addr1='${addr1s[i]}', addr2='${addr2s[i]}', city='${cities[i]}', state='${states[i]}', zip='${zips[i]}' where address_id=${addrIds[i]};`
+                    qry += `update addresses set type_id=${aTypeIds[i]}, addr1='${addr1s[i]}', addr2='${addr2s[i]}', city='${cities[i]}', state='${states[i]}', zip='${zips[i]}', sort=${sort} where address_id=${addrIds[i]};`
+                    sort++
                 } else {
                     qry += `delete from addresses where address_id=${addrIds[i]};`
                 }
             } else if (addr1s[i].length > 0 || addr2s[i].length > 0 || states[i].length > 0 || cities[i].length > 0 || zips[i].length > 0) {
-                qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', ${i + 1});`
+                qry += `insert into addresses (contact_id, type_id, addr1, addr2, city, state, zip, sort) values(${contId}, ${aTypeIds[i]}, '${addr1s[i]}', '${addr2s[i]}', '${cities[i]}', '${states[i]}', '${zips[i]}', ${sort});`
+                sort++
             }
         }
 
@@ -246,7 +261,7 @@ module.exports = {
     },
     deleteContacts: (req, res) => {
         console.log("deleteContacts req.body:", req.body)
-        const {userId, contIds} = req.body
+        const {userId, groupId, contIds} = req.body
         console.log("deleteContacts userId:", userId, "contIds:", contIds)
 
         let qry = ''
@@ -257,7 +272,7 @@ module.exports = {
             qry += `delete from contacts_groups where contact_id=${contId};`
             qry += `delete from contacts where contact_id=${contId};`
         }
-        qry += contactsQuery(userId)
+        qry += contactsQuery(userId, groupId)
         console.log("deleteContacts qry:", qry)
         sequelize.query(qry)
             .then(dbRes => res.status(200).send(dbRes[0]))
