@@ -251,20 +251,12 @@ li {
 	margin-bottom: 8px;
 }
 
-/* .city {
-    width: 100px;
-}
-
-.state {
-    width: 30px;
-}
-
-.zip {
-    width: 60px;
-} */
-
 .state, .zip {
     width: 72px;
+}
+
+.cont_disp_container {
+    padding-right: 16px;
 }
 
 .cont_sect, .cont_sect_edit {
@@ -272,17 +264,21 @@ li {
     font-size: 0.8em;
     margin-top: 12px;
     margin-bottom: -6px;
-    /* margin-left: 0.6em; */
 }
 
 .cont_sect {
+    border-top: 1px solid #CCCCCC;
+    padding-top: 8px;
     padding-left: 62px;
 }
 
 .cont_sect_edit {
     color: #1F1F1F;
     font-weight: 600;
+    border-top: 1px solid #000000;
+    padding-top: 8px;
     padding-left: 90px;
+    margin-right: 16px;
 }
 
 #p_sect, #e_sect, #a_sect {
@@ -320,12 +316,15 @@ div.cont_details {
     display: flex;
     align-items: baseline;
     gap: 0.6em;
+    padding: 0px;
     margin-top: 8px;
     margin-bottom: 8px;
 }
 
 .note {
-    margin-top: 6px;
+    border-top: 1px solid #CCCCCC;
+    padding-top: 8px;
+    margin-top: 8px;
 }
 
 div.login_view {
@@ -428,17 +427,13 @@ input[name="passwd2"] {
 
 #new_group_view {
     position: absolute;
-    /* display: flex;
-    align-items: center;
-    align-content: center; */
     box-sizing: border-box;
     top: 0px;
     left: 0px;
     height: 100%;
     width: 100%;
-    /* background-color: #000000; */
-    background-color: #565656;
-    padding-bottom: 25vh;
+    background-color: #878787;
+    padding-top: 10vh;
     z-index: 50;
     overflow: hidden;
     /* opacity: 0.6; */

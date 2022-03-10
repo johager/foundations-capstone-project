@@ -622,9 +622,9 @@ function showContactDisp() {
     contactLeftNavAction = getContacts
     contactRightNavAction = showEditContact
 
-    let innerHTML = ''
+    let innerHTML = '<div class="cont_disp_container">'
 
-    innerHTML += `<div class="contact_name">${fname}`
+    innerHTML += `\n<div class="contact_name">${fname}`
     if (fname.length > 0 && lname.length > 0) {
         innerHTML += ' '
     }
@@ -721,9 +721,11 @@ function showContactDisp() {
 
     // display note
     if (note.length > 0) {
-        innerHTML += '\n<div class="cont_sect">Note</div>'
+        // innerHTML += '\n<div class="cont_sect">Note</div>'
         innerHTML += `\n<div class="note">${note}</div>`
     }
+
+    innerHTML += "</div>"
 
     contactContent.innerHTML = innerHTML
 }
@@ -1186,7 +1188,7 @@ function showNewGroupView() {
     let innerHTML = `<div class="new_group">\n`
     innerHTML += `<form>\n`
     innerHTML += `<p>Make new group</p>\n`
-    innerHTML += `<input type="text" name="group" placeholder="group">\n`
+    innerHTML += `<input type="text" name="group" placeholder="group name">\n`
     innerHTML += `<div>\n`
     innerHTML += `<button id="cancel">Cancel</button><button id="create">Create</button>\n`
     innerHTML += `</div>\n`
