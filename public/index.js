@@ -1,3 +1,7 @@
+let mainHeaderIsBig = true
+let shouldShowContactView = true
+let isShowingContactDisp = false
+
 let userId = -1
 console.log("userId:", userId)
 
@@ -23,7 +27,7 @@ let pSelect = null  // phone-type select element
 let eSelect = null  // email-type select element
 let aSelect = null  // addr-type select element
 
-const mainheader = document.querySelector('.mainheader')
+const mainHeader = document.querySelector('.mainheader')
 
 const loginBtn = document.getElementById('login_btn')
 const signUpLink = document.querySelector('form').querySelector('a')
@@ -60,6 +64,57 @@ function clearTSelects() {
     pSelect = null
     eSelect = null
     aSelect = null
+}
+
+//
+// === view size ===
+//
+
+function setMainHeaderIsBig() {
+    mainHeaderIsBig = mainHeader.offsetWidth > 600
+    console.log(`setMainHeaderIsBig: ${mainHeaderIsBig}`)
+}
+
+function isMainHeaderBig() {
+    return mainHeader.offsetWidth > 600
+}
+
+function handleWindowResize(evt) {
+    console.log(`handleWindowResize mainHeader.offsetWidth: ${mainHeader.offsetWidth}`)
+
+    const mainHeaderIsNowBig = isMainHeaderBig()
+
+    if (mainHeaderIsNowBig === mainHeaderIsBig) {
+        console.log(`handleWindowResize - same`)
+        return
+    }
+
+    console.log(`handleWindowResize - change`)
+
+    mainHeaderIsBig = mainHeaderIsNowBig
+
+    if (userId < 0) {
+        return
+    }
+
+    if (mainHeaderIsNowBig) {
+        showContactsView()
+        showContactView()
+        if (isShowingContactDisp) {
+            contactLeftNav.textContent = ''
+        }
+    } else {
+        if (shouldShowContactView) {
+            hideContactsView()
+            showContactView()
+            if (isShowingContactDisp) {
+                contactLeftNav.textContent = '< Contacts'
+            }
+        } else {
+            showContactsView()
+            hideContactView()
+        }
+    }
 }
 
 //
@@ -138,7 +193,7 @@ function hideContactView() {
 
 function switchToContactsView() {
     console.log("switchToContactsView() === === ===")
-    if (mainheader.offsetWidth > 600) {
+    if (mainHeaderIsBig) {
         return
     }
     hideContactView()
@@ -147,7 +202,7 @@ function switchToContactsView() {
 
 function switchToContactView() {
     console.log("switchToContactView() === === ===")
-    if (mainheader.offsetWidth > 600) {
+    if (mainHeaderIsBig) {
         return
     }
     hideContactsView()
@@ -174,7 +229,7 @@ function doLogin(name) {
 
     hideLoginView()
     showContactsView()
-    if (mainheader.offsetWidth > 600) {
+    if (mainHeaderIsBig) {
         showContactView()
     }
 
@@ -190,7 +245,7 @@ function doLogin(name) {
 
     document.getElementById('login_view').style.display = 'none'
 
-    mainheader.firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
+    mainHeader.firstChild.innerHTML = `Welcome, ${name}<span>|</span><button id="logout">Logout</button>`
     document.getElementById('logout').addEventListener('click', handleLogout)
 
     getGroups()
@@ -233,8 +288,8 @@ function handleCreateUser(inputs) {
 
     let error = ''
 
-    if (inputs.name.length < 4) {
-        error += 'The name must have at least four (4) characters.'
+    if (inputs.name.length < 3) {
+        error += 'The name must have at least three (3) characters.'
     }
     
     error = testLoginInputs(inputs,error)
@@ -287,16 +342,16 @@ function handleLogin(inputs) {
     .then(res => {
         console.log("handleLogin then res.data:", res.data)
         if (res.data.userId < 0) {
-            console.log("handleLoginButton - user doesn't exist")
+            console.log("handleLogin - user doesn't exist")
             showAlert(`That login is incorrect.`)
         } else {
-            console.log("handleLoginButton - user exists")
+            console.log("handleLogin - user exists")
             userId = res.data.userId
             groupIdDisplayed = res.data.groupId
             contId = res.data.contId
-            console.log("handleLoginButton ......... userId:", userId)
-            console.log("handleLoginButton groupIdDisplayed:", groupIdDisplayed)
-            console.log("handleLoginButton ......... contId:", contId)
+            console.log("handleLogin ......... userId:", userId)
+            console.log("handleLogin groupIdDisplayed:", groupIdDisplayed)
+            console.log("handleLogin ......... contId:", contId)
             groupSelect.value = groupIdDisplayed
             doLogin(res.data.name)
         }
@@ -350,7 +405,7 @@ function handleLogout(evt) {
     contactInfo = []
     contactInfoDisplayed = []
 
-    mainheader.firstChild.innerHTML = ''
+    mainHeader.firstChild.innerHTML = ''
     contactsContent.innerHTML = ''
     contactContent.innerHTML = ''
 
@@ -391,7 +446,7 @@ function showAddContact() {
     contactsLeftNav.textContent = ''
     contactsRightNav.textContent = ''
 
-    if (mainheader.offsetWidth > 600) {
+    if (mainHeaderIsBig) {
         if (contId < 0 ) {
             contactLeftNavAction = showContactDispNoContact
         } else {
@@ -547,6 +602,8 @@ function showContactDisplayed() {
 function showContactDisp() {
     console.log("showContactDisp() === === ===")
 
+    isShowingContactDisp = true
+
     clearTSelects()
 
     switchToContactView()
@@ -554,7 +611,7 @@ function showContactDisp() {
     const {fname, lname, company} = contactInfo[0]
     const note = contactInfo[0].note.replace(/(?:\r\n|\r|\n)/g, '<br>')
 
-    if (mainheader.offsetWidth > 600) {
+    if (mainHeaderIsBig) {
         contactLeftNav.textContent = ''
     } else {
         contactLeftNav.textContent = '< Contacts'
@@ -790,6 +847,9 @@ function showContactAddEdit(titleText) {
     console.log("showContactAddEdit() === === ===")
 
     switchToContactView()
+
+    shouldShowContactView = true
+    isShowingContactDisp = false
 
     const {fname, lname, company, note} = contactInfo[0]
 
@@ -1190,6 +1250,8 @@ function getTypeArrays() {
     .catch(err => console.log(err))
 }
 
+window.onresize = handleWindowResize
+
 loginBtn.addEventListener('click', handleLoginButton)
 signUpLink.addEventListener('click', handleSignUpLink)
 
@@ -1209,3 +1271,5 @@ if (userId > 0) {
 }
 // getContacts()
 // getTypeArrays()
+
+setMainHeaderIsBig()
