@@ -10,6 +10,8 @@ let groups = []
 
 let contacts = []
 
+// let getContactsCount = 0
+
 let contId = -1
 // let contId = 78
 let contactInfo = []
@@ -413,6 +415,8 @@ function handleLogout(evt) {
     contactRightNav.textContent = ''
 
     clearTSelects()
+
+    // getContactsCount = 0
 }
 
 //
@@ -1074,6 +1078,12 @@ function getContacts() {
 
     setDefaultContactsNav()
     clearTSelects()
+
+    // getContactsCount++
+    // if (getContactsCount > 2) {
+    //     doShowContacts()
+    //     return
+    // }
 
     axios.get(`/api/contacts?uid=${userId}&gid=${groupIdDisplayed}`)
     .then(res => {
