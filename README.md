@@ -26,4 +26,4 @@ npm i pg pg-hstore
 
 The .env file should include  
 PORT - port for the server  
-CONNECTION_STRING - URI for the PostgreSQL database  
+DATABASE_URL - URI for the PostgreSQL database  
