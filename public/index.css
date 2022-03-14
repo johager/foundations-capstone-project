@@ -281,9 +281,6 @@ li {
     margin-right: 16px;
 }
 
-#p_sect, #e_sect, #a_sect {
-}
-
 .type, .type_edit {
     color: #646464;
     font-size: 0.8em;
@@ -467,9 +464,9 @@ input[name="passwd2"] {
     left: 352px;
 }
 
-#login_view {
-    /* display: none; */
-}
+/* #login_view {
+    display: none;
+} */
 
 #contacts_view, #contact_view {
     display: none;
