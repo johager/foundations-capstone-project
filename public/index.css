@@ -459,7 +459,6 @@ input[name="passwd2"] {
 #login_view {
     background-image: url("background.png");
     background-repeat: repeat;
-    width: 704px;
     z-index: 500;
 }
 
