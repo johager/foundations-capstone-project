@@ -397,6 +397,7 @@ function handleLogout(evt) {
     console.log("handleLogout(evt) === === ===")
     
     showLoginView()
+    removeNewGroupView()
     hideContactsView()
     hideContactView()
 
@@ -1155,9 +1156,10 @@ function getGroups() {
     .catch(err => console.log(err))
 }
 
-function removeNewGroupView(evt) {
+function removeNewGroupView() {
     console.log("removeNewGroupView() === === ===")
     document.getElementById('new_group_view').remove()
+    document.getElementById('new_group_background_view').remove()
     groupSelect.value = groupIdDisplayed
 }
 
@@ -1192,8 +1194,15 @@ function makeNewGroup(evt) {
 
 function showNewGroupView() {
     console.log("showNewGroupView() === === ===")
-    const newGroupView = document.createElement('div')
+
+    const newGroupBackgroundView = document.createElement('section')
+    newGroupBackgroundView.id = 'new_group_background_view'
+    newGroupBackgroundView.classList = "two_wide"
+    document.querySelector('main').appendChild(newGroupBackgroundView)
+
+    const newGroupView = document.createElement('section')
     newGroupView.id = 'new_group_view'
+    newGroupView.classList = "two_wide"
 
     let innerHTML = `<div class="new_group">\n`
     innerHTML += `<form>\n`

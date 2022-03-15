@@ -10,11 +10,14 @@ body {
     overflow: hidden;
 }
 
+.two_wide {
+    width: 704px;
+}
+
 .center {
     position: relative;
     box-sizing: border-box;
     height: 100vh;
-    width: 704px;
     margin: 0px auto;
 }
 
@@ -422,22 +425,25 @@ input[name="passwd2"] {
     display: none;
 }
 
-#new_group_view {
+#new_group_background_view {
     position: absolute;
     box-sizing: border-box;
-    top: 0px;
-    left: 0px;
-    height: 100%;
-    width: 100%;
     background-color: #878787;
     padding-top: 10vh;
     z-index: 50;
     overflow: hidden;
-    /* opacity: 0.6; */
+    opacity: 0.7;
+}
+
+#new_group_view {
+    position: absolute;
+    box-sizing: border-box;
+    padding-top: 10vh;
+    z-index: 100;
+    overflow: hidden;
 }
 
 .new_group {
-    /* opacity: 1.0; */
     box-sizing: border-box;
     width: 300px;
     background-color: #FFFFFF;
@@ -454,6 +460,7 @@ input[name="passwd2"] {
     background-image: url("background.png");
     background-repeat: repeat;
     width: 704px;
+    z-index: 500;
 }
 
 #contacts_view {
@@ -474,7 +481,7 @@ input[name="passwd2"] {
 }
 
 @media (max-width: 770px) {
-    .center, #login_view {
+    .two_wide {
         width: 352px;
     }
     #contacts_view {
